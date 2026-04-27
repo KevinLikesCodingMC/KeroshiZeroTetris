@@ -1,0 +1,8 @@
+//
+// Created by keroshi on 2026/4/27.
+//
+
+#ifndef KEROSHIZEROTETRIS_DEF_H
+#define KEROSHIZEROTETRIS_DEF_H
+
+#endif //KEROSHIZEROTETRIS_DEF_H
