@@ -6,7 +6,7 @@
 #define KEROSHIZEROTETRIS_MINO_H
 
 namespace Mino {
-	// Mid (6, 21)
+	// Mid (5, 21)
 	constexpr int O[4][4][2] = {
 		{{0, 0}, {0, - 1}, {- 1, 0}, {- 1, - 1}},
 		{{0, 0}, {0, - 1}, {- 1, 0}, {- 1, - 1}},
