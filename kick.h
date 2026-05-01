@@ -36,6 +36,38 @@ namespace SRSP {
 		{{0, 0}, {0, - 1}, {- 1, - 1}, {+ 1, - 1}, {- 1, 0}, {+ 1, 0}},
 		{{0, 0}, {- 1, 0}, {- 1, + 2}, {- 1, + 1}, {0, + 2}, {0, + 1}},
 	};
+
+	// 0, I, J, L, O, S, T, Z
+	inline const int (* kicks_cw[])[5][2] = {
+		nullptr,
+		KICK_CW_I,
+		KICK_CW_JLSZT,
+		KICK_CW_JLSZT,
+		nullptr,
+		KICK_CW_JLSZT,
+		KICK_CW_JLSZT,
+		KICK_CW_JLSZT,
+	};
+	inline const int (* kicks_ccw[])[5][2] = {
+		nullptr,
+		KICK_CCW_I,
+		KICK_CCW_JLSZT,
+		KICK_CCW_JLSZT,
+		nullptr,
+		KICK_CCW_JLSZT,
+		KICK_CCW_JLSZT,
+		KICK_CCW_JLSZT,
+	};
+	inline const int (* kicks_180[])[6][2] = {
+		nullptr,
+		KICK_180,
+		KICK_180,
+		KICK_180,
+		nullptr,
+		KICK_180,
+		KICK_180,
+		KICK_180,
+	};
 }
 
 #endif //KEROSHIZEROTETRIS_KICK_H
