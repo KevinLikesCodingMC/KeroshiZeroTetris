@@ -9,5 +9,15 @@
 #include <random>
 #include <algorithm>
 #include <iostream>
+#include <queue>
+
+enum class Piece : uint8_t {
+	EMPTY = 0,
+	I, J, L, O, S, T, Z
+};
+
+enum class Spin : uint8_t {
+	None, Mini, Full
+};
 
 #endif //KEROSHIZEROTETRIS_DEF_H
