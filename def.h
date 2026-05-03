@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <iostream>
 #include <queue>
+#include <functional>
 
 enum class Piece : uint8_t {
 	EMPTY = 0,
