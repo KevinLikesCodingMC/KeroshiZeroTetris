@@ -5,6 +5,13 @@ set(CMAKE_CXX_STANDARD 20)
 
 include_directories(${CMAKE_SOURCE_DIR})
 
+if(UNIX)
+	list(APPEND CMAKE_PREFIX_PATH "/opt/libtorch")
+endif()
+
+find_package(Torch REQUIRED)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+
 add_executable(
 		test_mino
 		test/test_mino.cpp
@@ -24,6 +31,12 @@ add_executable(
 		test_tetris_random
 		test/test_tetris_random.cpp
 )
+
+add_executable(
+		test_libtorch
+		test/test_libtorch.cpp
+)
+target_link_libraries(test_libtorch "${TORCH_LIBRARIES}")
 
 if(MSVC)
 	add_compile_options(/O2 /arch:AVX2 /fp:fast /Ot /GL /Qpar)
