@@ -19,11 +19,23 @@ struct Placement {
 };
 
 struct Action {
+	struct ActionDecode {
+		int x, y, r;
+	};
 	static int hold() {
 		return 0;
 	}
 	static int place(int x, int y, int r) {
 		return (y << 6 | x << 2 | r) + 1;
+	}
+	static ActionDecode decode(int u) {
+		if (u <= 0) return {0, 0, 0};
+		u --;
+		return {
+			u >> 2 & 15,
+			u >> 6,
+			u & 3
+		};
 	}
 };
 
@@ -270,10 +282,7 @@ struct Tetris {
 			use_hold();
 		}
 		else {
-			action --;
-			int x = action >> 2 & 15;
-			int y = action >> 6;
-			int r = action & 3;
+			auto [x, y, r] = Action :: decode(action);
 			place(x, y, r);
 		}
 	}

@@ -56,10 +56,7 @@ struct InputConverter {
 				acc[i][3] = 0;
 			}
 			else {
-				u --;
-				int x = u >> 2 & 15;
-				int y = u >> 6;
-				int r = u & 3;
+				auto [x, y, r] = Action :: decode(u);
 				acc[i][0] = x;
 				acc[i][1] = y;
 				acc[i][2] = r;

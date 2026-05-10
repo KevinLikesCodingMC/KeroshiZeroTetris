@@ -27,11 +27,8 @@ int main() {
 	std :: vector actions = tetris.legal();
 	for (int action : actions) {
 		if (action == 0) continue;
-		action --;
 		std :: memcpy(b, a, sizeof b);
-		int x = action >> 2 & 15;
-		int y = action >> 6;
-		int r = action & 3;
+		auto [x, y, r] = Action :: decode(action);
 		int piece = static_cast<int>(tetris.cur);
 		for (int i = 0; i < 4; i ++) {
 			int X = x + Mino :: minos[piece][r][i][0];
