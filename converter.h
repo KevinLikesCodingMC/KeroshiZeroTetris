@@ -8,12 +8,12 @@
 #include "def.h"
 #include "tetris.h"
 
-#include <torch/torch.h>
+#include <ATen/ATen.h>
 
 struct InputConverter {
 
-	static torch :: Tensor to_board(const Tetris & t) {
-		auto tensor = torch :: zeros({1, 1, 30, 10}, torch :: kFloat32);
+	static at :: Tensor to_board(const Tetris & t) {
+		auto tensor = at :: zeros({1, 1, 30, 10}, at :: kFloat);
 		auto acc = tensor.accessor<float, 4>();
 		for (int i = 0; i < 30; i ++) for (int j = 0; j < 10; j ++) {
 			if (t.b[i] >> j & 1) acc[0][0][i][j] = 1.f;
@@ -21,8 +21,8 @@ struct InputConverter {
 		return tensor;
 	}
 
-	static torch :: Tensor to_seq(const Tetris & t) {
-		auto tensor = torch :: zeros({1, 10}, torch :: kLong);
+	static at :: Tensor to_seq(const Tetris & t) {
+		auto tensor = at :: zeros({1, 10}, at :: kLong);
 		auto acc = tensor.accessor<int64_t, 2>();
 		acc[0][0] = static_cast<int64_t>(t.cur);
 		acc[0][1] = static_cast<int64_t>(t.hold);
@@ -32,8 +32,8 @@ struct InputConverter {
 		return tensor;
 	}
 
-	static torch :: Tensor to_info(const Tetris & t) {
-		auto tensor = torch :: zeros({1, 10}, torch :: kFloat32);
+	static at :: Tensor to_info(const Tetris & t) {
+		auto tensor = at :: zeros({1, 10}, at :: kFloat);
 		auto acc = tensor.accessor<float, 2>();
 		acc[0][0] = t.can_hold ? 1.f : 0.f;
 		acc[0][1] = t.combo;
@@ -43,9 +43,9 @@ struct InputConverter {
 		return tensor;
 	}
 
-	static torch :: Tensor to_pos(const std :: vector<int> & actions, int cur) {
+	static at :: Tensor to_pos(const std :: vector<int> & actions, int cur) {
 		int n = actions.size();
-		auto tensor = torch :: zeros({n, 4}, torch :: kFloat32);
+		auto tensor = at :: zeros({n, 4}, at :: kFloat);
 		auto acc = tensor.accessor<float, 2>();
 		for (int i = 0; i < n; i ++) {
 			int u = actions[i];
@@ -65,13 +65,13 @@ struct InputConverter {
 		}
 		return tensor;
 	}
-	static torch :: Tensor to_pos(Tetris & t) {
+	static at :: Tensor to_pos(Tetris & t) {
 		return to_pos(t.legal(), static_cast<int>(t.cur));
 	}
 
-	static torch :: Tensor to_offset(const torch :: Tensor & pos) {
+	static at :: Tensor to_offset(const at :: Tensor & pos) {
 		int64_t n = pos.size(0);
-		return torch :: tensor({n}, torch :: kLong);
+		return at :: tensor({n}, at :: kLong);
 	}
 };
 
