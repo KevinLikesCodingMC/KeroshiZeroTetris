@@ -51,4 +51,4 @@ add_executable(
 		test_libtorch
 		test/test_libtorch.cpp
 )
-target_link_libraries(test_libtorch PRIVATE torch_pch)
+target_link_libraries(test_libtorch "${TORCH_LIBRARIES}")
