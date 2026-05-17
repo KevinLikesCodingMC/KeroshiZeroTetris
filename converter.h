@@ -5,7 +5,6 @@
 #ifndef KEROSHIZEROTETRIS_CONVERTER_H
 #define KEROSHIZEROTETRIS_CONVERTER_H
 
-#include "def.h"
 #include "tetris.h"
 
 #include <ATen/ATen.h>

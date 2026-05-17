@@ -6,11 +6,8 @@
 #define KEROSHIZEROTETRIS_DEF_H
 
 #include <cstdint>
-#include <random>
 #include <algorithm>
 #include <iostream>
-#include <queue>
-#include <functional>
 
 enum class Piece : uint8_t {
 	EMPTY = 0,

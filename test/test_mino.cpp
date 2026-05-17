@@ -2,9 +2,9 @@
 // Created by keroshi on 2026/4/30.
 //
 
-#include "def.h"
 #include "mino.h"
 
+#include <iostream>
 #include <thread>
 #include <chrono>
 

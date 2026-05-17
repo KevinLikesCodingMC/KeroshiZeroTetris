@@ -7,6 +7,8 @@
 
 #include "def.h"
 
+#include <functional>
+
 using ComboFunc = std :: function <int(
 	int clear, Spin spin, int combo, int b2b, bool pc
 )>;

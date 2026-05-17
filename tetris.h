@@ -10,6 +10,9 @@
 #include "mino.h"
 #include "kick.h"
 
+#include <random>
+#include <queue>
+
 struct Placement {
 	Piece piece;
 	int x, y, r;
