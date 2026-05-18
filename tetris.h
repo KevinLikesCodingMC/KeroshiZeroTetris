@@ -53,7 +53,7 @@ struct Tetris {
 
 	bool game_over, can_hold;
 
-	int pieces, attack;
+	int pieces; float attack;
 
 	Placement last_placement;
 
