@@ -59,3 +59,14 @@ add_executable(
 )
 target_link_libraries(test_model_input "${TORCH_LIBRARIES}")
 
+install(
+		TARGETS
+		test_mino
+		test_tetris_legal
+		test_spin_check
+		test_tetris_random
+		test_libtorch
+		test_model_input
+		DESTINATION
+		bin
+)
