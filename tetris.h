@@ -59,7 +59,11 @@ struct Tetris {
 
 	ComboFunc combo_func;
 
+	bool depleted;
+
 	Tetris() {
+		depleted = false;
+
 		bag_pos = 0;
 		for (int i = 0; i < 7; i ++) {
 			bag[i] = static_cast<Piece>(i + 1);
@@ -89,6 +93,11 @@ struct Tetris {
 
 	Piece get_next() {
 		static std :: mt19937 rnd(std :: random_device{}());
+
+		if (depleted) {
+			return Piece :: EMPTY;
+		}
+
 		if (bag_pos == 0) {
 			bag_pos = 7;
 			std :: shuffle(bag, bag + 7, rnd);
@@ -384,6 +393,14 @@ struct Tetris {
 			}
 		}
 		return res;
+	}
+
+	bool is_over() const {
+		return game_over;
+	}
+
+	bool is_leaf() const {
+		return game_over || cur == Piece :: EMPTY;
 	}
 };
 
