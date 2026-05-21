@@ -57,6 +57,24 @@ void board5() {
 	x = 6; y = 2; r = 3;
 }
 
+void board6() {
+	tetris = Tetris();
+	tetris.cur = Piece :: T;
+	tetris.b[2] = 0b0000000001;
+	tetris.b[1] = 0b0000000001;
+	tetris.b[0] = 0b1111111101;
+	x = 2; y = 2; r = 1;
+}
+
+void board7() {
+	tetris = Tetris();
+	tetris.cur = Piece :: T;
+	tetris.b[2] = 0b0000000000;
+	tetris.b[1] = 0b0000000001;
+	tetris.b[0] = 0b1111111101;
+	x = 2; y = 2; r = 1;
+}
+
 void test() {
 	if (! tetris.is_legal(x, y, r)) {
 		std :: cout << "illegal" << std :: endl;
@@ -76,7 +94,7 @@ void test() {
 }
 
 int main() {
-	board4();
+	board6();
 	test();
 	return 0;
 }

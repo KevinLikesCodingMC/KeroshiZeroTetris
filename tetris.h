@@ -131,10 +131,12 @@ struct Tetris {
 		return b[y] >> x & 1;
 	}
 
-	bool tspin_check_srs5(int x, int y, int r) {
+	int tspin_check(int x, int y, int r) {
 		// Piece 6 is T
 		auto kicks_cw = SRSP :: kicks_cw[6];
 		auto kicks_ccw = SRSP :: kicks_ccw[6];
+
+		int res = 0;
 
 		for (int dx = - 2; dx <= 2; dx ++)
 		for (int dy = - 2; dy <= 2; dy ++)
@@ -149,8 +151,8 @@ struct Tetris {
 				int X = px + h[0];
 				int Y = py + h[1];
 				if (is_legal(X, Y, R)) {
-					if (kick == 5 && X == x && Y == y && R == r) {
-						return true;
+					if (X == x && Y == y && R == r) {
+						res |= 1 << kick;
 					}
 					break;
 				}
@@ -163,15 +165,15 @@ struct Tetris {
 				int X = px + h[0];
 				int Y = py + h[1];
 				if (is_legal(X, Y, R)) {
-					if (kick == 5 && X == x && Y == y && R == r) {
-						return true;
+					if (X == x && Y == y && R == r) {
+						res |= 1 << kick;
 					}
 					break;
 				}
 				kick ++;
 			}
 		}
-		return false;
+		return res;
 	}
 
 	Spin spin_check(int x, int y, int r) {
@@ -196,15 +198,19 @@ struct Tetris {
 				cnt2 += is_occupied(mx + dx[r][0], my + dy[r][0]);
 				cnt2 += is_occupied(mx + dx[r][1], my + dy[r][1]);
 
+				int res = tspin_check(x, y, r);
+
 				if (cnt2 == 2) {
 					return Spin :: Full;
 				}
 
-				if (tspin_check_srs5(x, y, r)) {
+				if (res >> 5 & 1) {
 					return Spin :: Full;
 				}
 
-				return Spin :: Mini;
+				if (res) {
+					return Spin :: Mini;
+				}
 			}
 		}
 		if (
