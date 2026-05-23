@@ -45,6 +45,7 @@ add_executable(
 add_executable(
 		test_tetris_random
 		test/test_tetris_random.cpp
+		src/render.cpp
 )
 
 add_executable(
