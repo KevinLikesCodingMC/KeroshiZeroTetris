@@ -223,8 +223,7 @@ struct Tetris {
 	}
 
 	void place(int x, int y, int r) {
-		Placement placement{};
-		placement.piece = cur;
+		Placement placement {cur, x, y, r};
 		pieces ++;
 
 		placement.spin = spin_check(x, y, r);
