@@ -132,4 +132,4 @@ class KeroshiZeroNet(nn.Module):
 if __name__ == '__main__':
 	model = KeroshiZeroNet()
 	script_model = torch.jit.script(model)
-	script_model.save("model/default.pt")
+	script_model.save("default.pt")
