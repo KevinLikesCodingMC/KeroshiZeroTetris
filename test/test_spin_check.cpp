@@ -2,7 +2,7 @@
 // Created by keroshi on 2026/5/2.
 //
 
-#include "tetris.h"
+#include "include/tetris.h"
 
 Tetris tetris;
 int x, y, r;

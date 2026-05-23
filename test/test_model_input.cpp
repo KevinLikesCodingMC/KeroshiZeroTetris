@@ -2,9 +2,9 @@
 // Created by keroshi on 2026/5/10.
 //
 
-#include "tetris.h"
-#include "converter.h"
-#include "model_loader.h"
+#include "include/tetris.h"
+#include "include/converter.h"
+#include "include/model_loader.h"
 
 int main(int argc, char * argv []) {
 	if (argc < 2) {

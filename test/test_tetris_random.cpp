@@ -2,7 +2,7 @@
 // Created by keroshi on 2026/5/3.
 //
 
-#include "tetris.h"
+#include "include/tetris.h"
 
 #include <thread>
 #include <chrono>

@@ -2,7 +2,7 @@
 // Created by keroshi on 2026/4/30.
 //
 
-#include "mino.h"
+#include "include/mino.h"
 
 #include <iostream>
 #include <thread>
