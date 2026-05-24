@@ -6,7 +6,8 @@ set(CMAKE_CXX_STANDARD 20)
 if(MSVC)
 	add_compile_options(/O2 /arch:AVX2 /fp:fast /Ot /GL /Qpar)
 else()
-	add_compile_options(-O3 -mavx2 -ffast-math -flto)
+	add_compile_options("$<$<CONFIG:Release>:-O3;-mavx2;-ffast-math;-flto>")
+	add_compile_options("$<$<CONFIG:Debug>:-O0;-g>")
 endif()
 
 include_directories(${CMAKE_SOURCE_DIR})
@@ -60,6 +61,12 @@ add_executable(
 		src/converter.cpp
 )
 target_link_libraries(test_model_input "${TORCH_LIBRARIES}")
+
+add_executable(
+		test_mcts_tetris
+		test/test_mcts_tetris.cpp
+		src/render.cpp
+)
 
 install(
 		TARGETS
