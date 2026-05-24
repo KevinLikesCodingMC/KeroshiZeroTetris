@@ -11,7 +11,7 @@ namespace TetrisRender {
 		for (int i = 0; i < 25; i ++) {
 			int y = 27 - i;
 			screen[y][1] = screen[y][12] = '#';
-			for (int x = 0; x < 9; x ++) {
+			for (int x = 0; x < 10; x ++) {
 				int o = tetris.b[i] >> x & 1;
 				if (o) screen[y][x + 2] = 'o';
 			}
