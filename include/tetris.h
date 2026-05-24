@@ -282,7 +282,6 @@ struct Tetris {
 		}
 
 		last_placement = placement;
-		roll();
 
 		if (placement.clear == 0) {
 			piece = static_cast<int>(cur);
@@ -292,6 +291,8 @@ struct Tetris {
 				if (is_occupied(X, Y)) game_over = true;
 			}
 		}
+
+		roll();
 	}
 
 	void step(int action) {
