@@ -99,7 +99,7 @@ struct MCTS {
 	}
 
 	int get_best() {
-		if (game.is_over()) return - 1;
+		if (root_game.is_over()) return - 1;
 		int id = 0, res = 0;
 		for (int i = 0; i < root -> n; i ++) {
 			if (root -> N[i] > res) {
