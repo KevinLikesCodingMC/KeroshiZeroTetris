@@ -6,19 +6,30 @@
 #include "include/tetris.h"
 #include "include/render.h"
 
+float score(Tetris & g) {
+	float V = 0;
+	V += g.attack * 10;
+	int top = 30;
+	for (int y = 29; y >= 0; y --) {
+		if (g.b[y]) break;
+		top = y;
+	}
+	V += (20 - top) * 0.3f;
+	return V;
+}
+
 int main() {
 	Tetris tetris;
 
 	for (int step = 0; step < 100; step ++) {
-		MCTS<Tetris, 20.f> mcts;
+		float fst = score(tetris);
+		MCTS<Tetris> mcts (20.f);
 		mcts.root_game = tetris;
 		mcts.root_game.depleted = true;
 
-		for (int _ = 0; _ < 10000; _ ++) {
+		for (int _ = 0; _ < 1000; _ ++) {
 			Tetris g = mcts.playout_select();
-			float V = g.attack * 100;
-
-			if (g.is_over()) V -= 10 - g.pieces + tetris.pieces;
+			float V = score(g) - fst;
 
 			if (g.is_leaf()) {
 				mcts.playout_back(V, {});
