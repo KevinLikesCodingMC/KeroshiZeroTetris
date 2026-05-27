@@ -5,7 +5,8 @@
 #ifndef KEROSHIZEROTETRIS_RECORD_H
 #define KEROSHIZEROTETRIS_RECORD_H
 
-#include "tetris.h"
+#include <cstdint>
+#include <vector>
 
 struct TetrisTrainData {
 	uint16_t b[30];
