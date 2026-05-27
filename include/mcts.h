@@ -17,8 +17,9 @@ concept GameState = requires ( G g , int action) {
 	{ g.is_leaf() } -> std :: same_as<bool>;
 };
 
-template < GameState Game, float Max_Q = 1.f, float C = 1.414f>
+template < GameState Game>
 struct MCTS {
+	float QR, C;
 	struct Node {
 		int n = 0;
 		std :: vector<int> a;
@@ -30,12 +31,12 @@ struct MCTS {
 		/*
 			Score = Q / MaxQ + C * P * sqrt(sum N) / (N + 1)
 		*/
-		int select() {
+		int select(float qr, float c) {
 			int id = 0;
 			float res = - 1e18;
-			float val = C * std :: sqrt(Sum_N);
+			float val = c * std :: sqrt(Sum_N);
 			for (int i = 0; i < n; i ++) {
-				float score = Q[i] / Max_Q + val * P[i] / (N[i] + 1.f);
+				float score = Q[i] / qr + val * P[i] / (N[i] + 1.f);
 				if (score > res) res = score, id = i;
 			}
 			return id;
@@ -47,7 +48,8 @@ struct MCTS {
 
 	std :: vector<std :: pair<Node *, int>> path;
 
-	MCTS() {
+	MCTS(float QR = 1.f, float C = 5.f)
+		: QR(QR) , C(C) {
 		root = nullptr;
 	}
 
@@ -56,7 +58,7 @@ struct MCTS {
 		path.clear();
 		Node * cur = root.get();
 		while (! game.is_leaf() && cur != nullptr) {
-			int u = cur -> select();
+			int u = cur -> select(QR, C);
 			path.emplace_back(cur, u);
 			game.step(cur -> a[u]);
 			cur = cur -> ch[u].get();
