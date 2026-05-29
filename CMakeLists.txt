@@ -59,6 +59,7 @@ add_executable(
 		test_model_input
 		test/test_model_input.cpp
 		src/converter.cpp
+		src/model_loader.cpp
 )
 target_link_libraries(test_model_input "${TORCH_LIBRARIES}")
 
