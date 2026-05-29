@@ -17,7 +17,7 @@ class ResBlock(nn.Module):
 		return F.relu(self.conv(x) + x)
 
 class KeroshiZeroNet(nn.Module):
-	def __init__(self):
+	def __init__(self, res_blocks = 6):
 		super(KeroshiZeroNet, self).__init__()
 
 		# Board (Batch, 1, 30, 10)
@@ -28,8 +28,9 @@ class KeroshiZeroNet(nn.Module):
 			nn.ReLU(),
 		)
 
-		self.res1 = ResBlock(64)
-		self.res2 = ResBlock(64)
+		self.res = nn.Sequential(
+			* [ResBlock(64) for _ in range(res_blocks)]
+		)
 
 		self.last_conv = nn.Sequential(
 			nn.Conv2d(64, 1, kernel_size = 1),
@@ -91,8 +92,7 @@ class KeroshiZeroNet(nn.Module):
 		board = torch.cat((board, meta_f), dim = 1)
 		# board (Batch, 64, 30, 10)
 
-		board = self.res1(board)
-		board = self.res2(board)
+		board = self.res(board)
 		board = self.last_conv(board)
 		# board (Batch, 300)
 
