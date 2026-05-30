@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 if(MSVC)
 	add_compile_options(/O2 /arch:AVX2 /fp:fast /Ot /GL /Qpar)
+	set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -allow-unsupported-compiler")
 else()
 	add_compile_options("$<$<CONFIG:Release>:-O3;-mavx2;-ffast-math;-flto>")
 	add_compile_options("$<$<CONFIG:Debug>:-O0;-g>")
@@ -14,6 +15,8 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 if(UNIX)
 	list(APPEND CMAKE_PREFIX_PATH "/opt/libtorch")
+elseif(MSVC)
+	list(APPEND CMAKE_PREFIX_PATH "F:/libtorch")
 endif()
 
 find_package(Torch REQUIRED)
