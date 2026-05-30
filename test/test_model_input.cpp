@@ -5,6 +5,7 @@
 #include "include/tetris.h"
 #include "include/converter.h"
 #include "include/model_loader.h"
+#include "include/timer.h"
 
 int main(int argc, char * argv []) {
 	if (argc < 2) {
@@ -17,7 +18,11 @@ int main(int argc, char * argv []) {
 
 	std :: string model_path = argv[1];
 
+	Timer timer;
+
 	auto model = ModelLoader :: load(model_path, true);
+
+	timer.elapsed("Load Model:");
 
 	Tetris tetris;
 
@@ -25,17 +30,23 @@ int main(int argc, char * argv []) {
 
 	std :: cout << device << std :: endl;
 
+	timer.reset();
+
 	at :: Tensor board_t = InputConverter :: to_board(tetris).to(device);
 	at :: Tensor seq_t = InputConverter :: to_seq(tetris).to(device);
 	at :: Tensor info_t = InputConverter :: to_info(tetris).to(device);
 	at :: Tensor pos_t = InputConverter :: to_pos(tetris).to(device);
 	at :: Tensor offset_t = InputConverter :: to_offset(pos_t).to(device);
 
+	timer.elapsed("InputConverter:");
+
 	std :: cout << board_t << std :: endl;
 	std :: cout << seq_t << std :: endl;
 	std :: cout << info_t << std :: endl;
 	std :: cout << pos_t << std :: endl;
 	std :: cout << offset_t << std :: endl;
+
+	timer.reset();
 
 	auto output = model.forward({
 		board_t,
@@ -48,6 +59,7 @@ int main(int argc, char * argv []) {
 	at :: Tensor value_t = output -> elements()[0].toTensor();
 	at :: Tensor policy_t = output -> elements()[1].toTensor();
 
+	timer.elapsed("Model Forward:");
 
 	std :: cout << value_t << std :: endl;
 	std :: cout << policy_t << std :: endl;
