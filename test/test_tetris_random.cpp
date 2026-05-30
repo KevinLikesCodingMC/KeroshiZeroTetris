@@ -4,6 +4,7 @@
 
 #include "include/tetris.h"
 #include "include/render.h"
+#include "include/timer.h"
 
 #include <thread>
 #include <chrono>
@@ -33,16 +34,30 @@ int test(bool if_print = false) {
 	return clears;
 }
 
-int main() {
-
-	test(true); return 0;
-
-	int cnt = 0, sum = 1e3;
-	for (int i = 0; i < sum; i ++) {
-		int c = test();
-		if (c) cnt ++;
+int main(int argc, char * argv []) {
+	if (argc < 2) {
+		std :: cout << "Usage: "
+					<< argv[0]
+					<< " [ render | speed ]"
+					<< std :: endl;
+		return 1;
 	}
-	std :: cout << cnt << " / " << sum << std :: endl;
+
+	std :: string arg(argv[1]);
+
+	if (arg == "render") {
+		test(true);
+	}
+	if (arg == "speed") {
+		int cnt = 0, sum = 1e3;
+		Timer timer;
+		for (int i = 0; i < sum; i ++) {
+			int c = test();
+			if (c) cnt ++;
+		}
+		timer.elapsed();
+		std :: cout << cnt << " / " << sum << std :: endl;
+	}
 
 	return 0;
 }
