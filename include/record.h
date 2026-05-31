@@ -13,11 +13,10 @@ struct TetrisTrainData {
 	uint8_t seq[10];
 	int info[10];
 	float V;
-	int len;
+	int len, p;
 	std :: vector<uint8_t> x;
 	std :: vector<uint8_t> y;
 	std :: vector<uint8_t> r;
-	std :: vector<uint8_t> p;
 	std :: vector<float> P;
 };
 
