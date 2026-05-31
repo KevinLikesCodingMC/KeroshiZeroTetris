@@ -72,6 +72,12 @@ add_executable(
 		src/render.cpp
 )
 
+add_executable(
+		test_buffer
+		test/test_buffer.cpp
+		src/buffer.cpp
+)
+
 install(
 		TARGETS
 		test_mino
@@ -80,6 +86,8 @@ install(
 		test_tetris_random
 		test_libtorch
 		test_model_input
+		test_mcts_tetris
+		test_buffer
 		DESTINATION
 		bin
 )
