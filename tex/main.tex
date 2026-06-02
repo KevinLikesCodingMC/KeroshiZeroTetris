@@ -1,7 +1,9 @@
 \documentclass{article}
 
 \usepackage{arxiv}
+
 \usepackage{graphicx}
+\usepackage{subcaption}
 
 \title{KeroshiZeroTetris: \\ \Large Self-Learning Modern Tetris AI}
 
@@ -19,13 +21,50 @@
 
 	\section{Introduction}
 
-	While traditional Tetris operates as a classic single-player survival puzzle,
-	Modern Tetris\footnote{Represented by competitive platforms such as \textit{TETR.IO}.} introduces an offensive garbage system and the Super Rotation System (SRS).
+	Traditional Tetris is a classic single-player survival game,
+	and Modern Tetris\footnote{
+		Examples include
+		competitive platforms like \textit{TETR.IO} and \textit{Techmino},
+		as well as official games like \textit{Tetris Effect: Connected}.
+	} introduces something new.
 	%
-	Consequently, the competitive paradigm shifts from passive survival to maximizing offensive output,
-	where players heavily prioritize achieving a higher Attack Per Piece (APP) metric.
+	Modern Tetris is usually played in a 1v1 competitive mode, and features an attack system.
+	Players can perform specific clears to send garbage lines to their opponents.
+	In addition, Modern Tetris also introduces the Super Rotation System (SRS),
+	so players can perform clears like T-Spin to gain more attack.
 
-	% \bibliographystyle{unsrt}
-	% \bibliography{references}
+	\begin{figure}[htbp]
+		\centering
+		\begin{subfigure}[b]{0.4\textwidth}
+			\centering
+			\includegraphics[width = 0.4 \textwidth]{img/2.png}
+			\caption{A T-Spin Double.}
+		\end{subfigure}
+		\begin{subfigure}[b]{0.4\textwidth}
+			\centering
+			\includegraphics[width = 0.4 \textwidth]{img/3.png}
+			\caption{A T-Spin Triple.}
+		\end{subfigure}
+		\caption{Some sample clears with SRS.}
+	\end{figure}
+
+	In Modern Tetris, human players often try to perform higher Attack Per Minute (APM), 
+	but Tetris AI needs to perform higher Attack Per Piece (APP).
+	
+	To challenge the highest APP, we present KeroshiZeroTetris based on AlphaZero\cite{silver2018general}.
+
+	However, directly applying the AlphaZero framework to Modern Tetris brings some difficulties:
+
+	\begin{itemize}
+		\item Unlike chess or Go, the next state is not fixed because of the 7-Bag random generator.
+		\item The neural network for Modern Tetris must be carefully designed to predict both policy and value information.
+		\item The Tetris AI needs to play indefinitely with a high APP,
+			so a major challenge is how to set up training tasks and how to implement the trained policy in actual match play.
+	\end{itemize}
+
+	To solve these issues, this paper details the implementation of KeroshiZeroTetris.
+
+	\bibliographystyle{unsrt} 
+	\bibliography{references}
 
 \end{document}
