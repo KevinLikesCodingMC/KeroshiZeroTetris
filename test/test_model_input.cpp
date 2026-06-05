@@ -36,7 +36,6 @@ int main(int argc, char * argv []) {
 	at :: Tensor seq_t = InputConverter :: to_seq(tetris).to(device);
 	at :: Tensor info_t = InputConverter :: to_info(tetris).to(device);
 	at :: Tensor pos_t = InputConverter :: to_pos(tetris).to(device);
-	at :: Tensor offset_t = InputConverter :: to_offset(pos_t).to(device);
 
 	timer.elapsed("InputConverter:");
 
@@ -44,7 +43,6 @@ int main(int argc, char * argv []) {
 	std :: cout << seq_t << std :: endl;
 	std :: cout << info_t << std :: endl;
 	std :: cout << pos_t << std :: endl;
-	std :: cout << offset_t << std :: endl;
 
 	timer.reset();
 
@@ -53,7 +51,6 @@ int main(int argc, char * argv []) {
 		seq_t,
 		info_t,
 		pos_t,
-		offset_t
 	}).toTuple();
 
 	at :: Tensor value_t = output -> elements()[0].toTensor();

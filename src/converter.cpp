@@ -3,6 +3,7 @@
 //
 
 #include "include/converter.h"
+#include "include/message.h"
 
 #include <ATen/ATen.h>
 
@@ -32,31 +33,41 @@ namespace InputConverter {
 		auto tensor = at :: zeros({1, 10}, at :: kFloat);
 		auto acc = tensor.accessor<float, 2>();
 		acc[0][0] = t.can_hold ? 1.f : 0.f;
-		acc[0][1] = t.combo;
-		acc[0][2] = t.b2b;
-		acc[0][3] = t.pieces;
-		acc[0][4] = t.attack;
+		acc[0][1] = static_cast<float>(t.combo) / 10.f;
+		acc[0][2] = static_cast<float>(std :: log(t.b2b + 1));
+		acc[0][3] = static_cast<float>(t.pieces);
+		acc[0][4] = static_cast<float>(t.attack);
 		return tensor;
 	}
 
 	at :: Tensor to_pos(const std :: vector<int> & actions, int cur) {
-		int n = actions.size();
-		auto tensor = at :: zeros({n, 4}, at :: kFloat);
-		auto acc = tensor.accessor<float, 2>();
+		int n = static_cast<int>(actions.size());
+
+		if (n > 128) {
+			Message :: log(Message :: ERROR, true,
+				"Action size is more than 128."
+			);
+			std :: exit(EXIT_FAILURE);
+		}
+
+		auto tensor = at :: zeros({1, 128, 5}, at :: kFloat);
+		auto acc = tensor.accessor<float, 3>();
 		for (int i = 0; i < n; i ++) {
 			int u = actions[i];
 			if (u == 0) {
-				acc[i][0] = 0;
-				acc[i][1] = 0;
-				acc[i][2] = 0;
-				acc[i][3] = 0;
+				acc[0][i][0] = 0;
+				acc[0][i][1] = 0;
+				acc[0][i][2] = 0;
+				acc[0][i][3] = 0;
+				acc[0][i][4] = 1;
 			}
 			else {
 				auto [x, y, r] = Action :: decode(u);
-				acc[i][0] = x;
-				acc[i][1] = y;
-				acc[i][2] = r;
-				acc[i][3] = cur;
+				acc[0][i][0] = x;
+				acc[0][i][1] = y;
+				acc[0][i][2] = r;
+				acc[0][i][3] = cur;
+				acc[0][i][4] = 1;
 			}
 		}
 		return tensor;
@@ -64,9 +75,4 @@ namespace InputConverter {
 	at :: Tensor to_pos(Tetris & t) {
 		return to_pos(t.legal(), static_cast<int>(t.cur));
 	}
-
-	at :: Tensor to_offset(const at :: Tensor & pos) {
-		int64_t n = pos.size(0);
-		return at :: tensor({n}, at :: kLong);
-	}
-};
+}

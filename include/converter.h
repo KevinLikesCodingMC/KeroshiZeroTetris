@@ -19,8 +19,6 @@ namespace InputConverter {
 
 	at :: Tensor to_pos(const std :: vector<int> & actions, int cur);
 	at :: Tensor to_pos(Tetris & t);
-
-	at :: Tensor to_offset(const at :: Tensor & pos);
 };
 
 #endif //KEROSHIZEROTETRIS_CONVERTER_H
