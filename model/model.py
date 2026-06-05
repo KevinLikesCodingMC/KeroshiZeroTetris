@@ -60,7 +60,7 @@ class PosEncoder(nn.Module):
 		self.pos_linear = nn.Linear(32, 32)
 
 	def forward(self, pos):
-		x, y, r, p = pos.unbind(dim = - 1)
+		x, y, r, p, mask = pos.unbind(dim = - 1)
 
 		x = x.float().unsqueeze(- 1) / 10.0
 		y = y.float().unsqueeze(- 1) / 20.0
@@ -75,7 +75,7 @@ class PosEncoder(nn.Module):
 		pos = torch.cat((xy, r, p), dim = - 1)
 		pos = F.relu(self.pos_linear(pos))
 
-		return pos
+		return pos, mask
 
 
 class KeroshiZeroNet(nn.Module):
@@ -117,7 +117,7 @@ class KeroshiZeroNet(nn.Module):
 			nn.Linear(128, 1),
 		)
 
-		# Pos (Batch, 128, 4)
+		# Pos (Batch, 128, 5)
 		self.pos_encoder = PosEncoder(self.piece_embedding)
 
 		self.policy = nn.Sequential(
@@ -129,8 +129,8 @@ class KeroshiZeroNet(nn.Module):
 	# board (Batch, 1, 30, 10)
 	# seq (Batch, 10)
 	# info (Batch, 10)
-	# pos (Batch, 128, 4)
-	def forward(self, board, seq, info, pos, mask):
+	# pos (Batch, 128, 5)
+	def forward(self, board, seq, info, pos):
 		batch = board.size(0)
 
 		board = self.first_conv(board)
@@ -162,7 +162,7 @@ class KeroshiZeroNet(nn.Module):
 		value = self.value(final)
 
 		final = final.unsqueeze(1).expand(- 1, 128, - 1)
-		pos = self.pos_encoder(pos)
+		pos, mask = self.pos_encoder(pos)
 		policy = torch.cat((final, pos), dim = - 1)
 		# policy (Batch, 128, 364)
 
