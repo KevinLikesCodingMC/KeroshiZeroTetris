@@ -12,54 +12,110 @@ int main(int argc, char * argv []) {
 		std :: cout << "Usage: "
 					<< argv[0]
 					<< " <model.pt>"
+					<< "[ output / speed ]"
 					<< std :: endl;
 		return 1;
 	}
 
 	std :: string model_path = argv[1];
 
-	Timer timer;
+	std :: string mode = "output";
 
-	auto model = ModelLoader :: load(model_path, true);
+	if (argc > 2) mode = argv[2];
 
-	timer.elapsed("Load Model:");
+	if (mode == "output") {
+		Timer timer;
 
-	Tetris tetris;
+		auto model = ModelLoader :: load(model_path, true);
 
-	auto device = (* model.parameters().begin()).device();
+		timer.elapsed("Load Model:");
 
-	std :: cout << device << std :: endl;
+		Tetris tetris;
 
-	timer.reset();
+		auto device = (* model.parameters().begin()).device();
 
-	at :: Tensor board_t = InputConverter :: to_board(tetris).to(device);
-	at :: Tensor seq_t = InputConverter :: to_seq(tetris).to(device);
-	at :: Tensor info_t = InputConverter :: to_info(tetris).to(device);
-	at :: Tensor pos_t = InputConverter :: to_pos(tetris).to(device);
+		std :: cout << device << std :: endl;
 
-	timer.elapsed("InputConverter:");
+		timer.reset();
 
-	std :: cout << board_t << std :: endl;
-	std :: cout << seq_t << std :: endl;
-	std :: cout << info_t << std :: endl;
-	std :: cout << pos_t << std :: endl;
+		at :: Tensor board_t = InputConverter :: to_board(tetris).to(device);
+		at :: Tensor seq_t = InputConverter :: to_seq(tetris).to(device);
+		at :: Tensor info_t = InputConverter :: to_info(tetris).to(device);
+		at :: Tensor pos_t = InputConverter :: to_pos(tetris).to(device);
 
-	timer.reset();
+		timer.elapsed("InputConverter:");
 
-	auto output = model.forward({
-		board_t,
-		seq_t,
-		info_t,
-		pos_t,
-	}).toTuple();
+		std :: cout << board_t << std :: endl;
+		std :: cout << seq_t << std :: endl;
+		std :: cout << info_t << std :: endl;
+		std :: cout << pos_t << std :: endl;
 
-	at :: Tensor value_t = output -> elements()[0].toTensor();
-	at :: Tensor policy_t = output -> elements()[1].toTensor();
+		timer.reset();
 
-	timer.elapsed("Model Forward:");
+		auto output = model.forward({
+			board_t,
+			seq_t,
+			info_t,
+			pos_t,
+		}).toTuple();
 
-	std :: cout << value_t << std :: endl;
-	std :: cout << policy_t << std :: endl;
+		at :: Tensor value_t = output -> elements()[0].toTensor();
+		at :: Tensor policy_t = output -> elements()[1].toTensor();
+
+		timer.elapsed("Model Forward:");
+
+		std :: cout << value_t << std :: endl;
+		std :: cout << policy_t << std :: endl;
+	}
+
+	if (mode == "speed") {
+		Timer timer;
+
+		auto model = ModelLoader :: load(model_path, true);
+
+		timer.elapsed("Load Model:");
+
+		Tetris tetris;
+
+		auto device = (* model.parameters().begin()).device();
+
+		std :: cout << device << std :: endl;
+
+		timer.reset();
+
+		at :: Tensor board_t = InputConverter :: to_board(tetris).to(device);
+		at :: Tensor seq_t = InputConverter :: to_seq(tetris).to(device);
+		at :: Tensor info_t = InputConverter :: to_info(tetris).to(device);
+		at :: Tensor pos_t = InputConverter :: to_pos(tetris).to(device);
+
+		timer.elapsed("InputConverter:");
+
+		auto predict = [&] () {
+			auto output = model.forward({
+				board_t,
+				seq_t,
+				info_t,
+				pos_t,
+			}).toTuple();
+
+			at :: Tensor value_t = output -> elements()[0].toTensor();
+
+			return value_t[0].item<float>();
+		};
+
+		// warm up
+		for (int i = 0; i < 5; i ++) predict();
+
+		timer.reset();
+
+		for (int i = 0; i < 10; i ++) {
+			std :: cout << predict() << " ";
+		}
+		std :: cout << std :: endl;
+
+		timer.elapsed("Model Forward:");
+
+	}
 
 	return 0;
 }
