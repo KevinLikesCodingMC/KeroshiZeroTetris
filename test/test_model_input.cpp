@@ -38,12 +38,12 @@ int main(int argc, char * argv []) {
 
 		timer.reset();
 
-		at :: Tensor board_t = InputConverter :: to_board(tetris).to(device);
-		at :: Tensor seq_t = InputConverter :: to_seq(tetris).to(device);
-		at :: Tensor info_t = InputConverter :: to_info(tetris).to(device);
-		at :: Tensor pos_t = InputConverter :: to_pos(tetris).to(device);
+		at :: Tensor board_t = Converter :: to_board(tetris).to(device);
+		at :: Tensor seq_t = Converter :: to_seq(tetris).to(device);
+		at :: Tensor info_t = Converter :: to_info(tetris).to(device);
+		at :: Tensor pos_t = Converter :: to_pos(tetris).to(device);
 
-		timer.elapsed("InputConverter:");
+		timer.elapsed("Converter:");
 
 		std :: cout << board_t << std :: endl;
 		std :: cout << seq_t << std :: endl;
@@ -83,12 +83,12 @@ int main(int argc, char * argv []) {
 
 		timer.reset();
 
-		at :: Tensor board_t = InputConverter :: to_board(tetris).to(device);
-		at :: Tensor seq_t = InputConverter :: to_seq(tetris).to(device);
-		at :: Tensor info_t = InputConverter :: to_info(tetris).to(device);
-		at :: Tensor pos_t = InputConverter :: to_pos(tetris).to(device);
+		at :: Tensor board_t = Converter :: to_board(tetris).to(device);
+		at :: Tensor seq_t = Converter :: to_seq(tetris).to(device);
+		at :: Tensor info_t = Converter :: to_info(tetris).to(device);
+		at :: Tensor pos_t = Converter :: to_pos(tetris).to(device);
 
-		timer.elapsed("InputConverter:");
+		timer.elapsed("Converter:");
 
 		auto predict = [&] () {
 			auto output = model.forward({

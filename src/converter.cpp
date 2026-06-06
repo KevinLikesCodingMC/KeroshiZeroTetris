@@ -7,7 +7,7 @@
 
 #include <ATen/ATen.h>
 
-namespace InputConverter {
+namespace Converter {
 
 	at :: Tensor to_board(const Tetris & t) {
 		auto tensor = at :: zeros({1, 1, 30, 10}, at :: kFloat);
@@ -50,8 +50,8 @@ namespace InputConverter {
 			std :: exit(EXIT_FAILURE);
 		}
 
-		auto tensor = at :: zeros({1, 128, 5}, at :: kFloat);
-		auto acc = tensor.accessor<float, 3>();
+		auto tensor = at :: zeros({1, 128, 5}, at :: kLong);
+		auto acc = tensor.accessor<int64_t, 3>();
 		for (int i = 0; i < n; i ++) {
 			int u = actions[i];
 			if (u == 0) {
@@ -74,5 +74,87 @@ namespace InputConverter {
 	}
 	at :: Tensor to_pos(Tetris & t) {
 		return to_pos(t.legal(), static_cast<int>(t.cur));
+	}
+
+
+	at :: Tensor to_board(const std :: vector<TetrisTrainData> & data) {
+		int batch = data.size();
+		auto tensor = at :: zeros({batch, 1, 30, 10}, at :: kFloat);
+		auto acc = tensor.accessor<float, 4>();
+		for (int i = 0; i < batch; i ++) {
+			for (int y = 0; y < 30; y ++) for (int x = 0; x < 10; x ++) {
+				if (data[i].b[y] >> x & 1) acc[i][0][y][x] = 1.f;
+			}
+		}
+		return tensor;
+	}
+
+	at :: Tensor to_seq(const std :: vector<TetrisTrainData> & data) {
+		int batch = data.size();
+		auto tensor = at :: zeros({batch, 10}, at :: kLong);
+		auto acc = tensor.accessor<int64_t, 2>();
+		for (int i = 0; i < batch; i ++) {
+			for (int j = 0; j < 10; j ++)
+				acc[i][j] = data[i].seq[j];
+		}
+		return tensor;
+	}
+
+	at :: Tensor to_info(const std :: vector<TetrisTrainData> & data) {
+		int batch = data.size();
+		auto tensor = at :: zeros({batch, 10}, at :: kFloat);
+		auto acc = tensor.accessor<float, 2>();
+		for (int i = 0; i < batch; i ++) {
+			for (int j = 0; j < 10; j ++)
+				acc[i][j] = data[i].info[j];
+		}
+		return tensor;
+	}
+
+	at :: Tensor to_pos(const std :: vector<TetrisTrainData> & data) {
+		int batch = data.size();
+
+		auto tensor = at :: zeros({batch, 128, 5}, at :: kLong);
+		auto acc = tensor.accessor<int64_t, 3>();
+
+		for (int i = 0; i < batch; i ++) {
+			int len = data[i].len;
+			for (int j = 0; j < len; j ++) {
+				acc[i][j][0] = data[i].x[j];
+				acc[i][j][1] = data[i].y[j];
+				acc[i][j][2] = data[i].r[j];
+				acc[i][j][3] = data[i].p;
+				acc[i][j][4] = 1;
+			}
+		}
+		return tensor;
+	}
+
+	at :: Tensor to_V(const std :: vector<TetrisTrainData> & data) {
+		int batch = data.size();
+
+		auto tensor = at :: zeros({batch, 1}, at :: kFloat);
+		auto acc = tensor.accessor<float, 2>();
+
+		for (int i = 0; i < batch; i ++) {
+			acc[i][0] = data[i].V;
+		}
+
+		return tensor;
+	}
+
+	at :: Tensor to_P(const std :: vector<TetrisTrainData> & data) {
+		int batch = data.size();
+
+		auto tensor = at :: zeros({batch, 128}, at :: kFloat);
+		auto acc = tensor.accessor<float, 2>();
+
+		for (int i = 0; i < batch; i ++) {
+			int len = data[i].len;
+			for (int j = 0; j < len; j ++)
+				acc[i][j] = data[i].P[j];
+		}
+
+		return tensor;
 	}
 }
