@@ -33,6 +33,7 @@ struct TetrisBuffer {
 	void add_game(const TetrisTrainData & data);
 	void add_game(const std :: vector<TetrisTrainData> & data);
 
+	TetrisTrainData sample();
 };
 
 #endif //KEROSHIZEROTETRIS_BUFFER_H
