@@ -23,7 +23,7 @@ int main() {
 
 	for (int step = 0; step < 100; step ++) {
 		float fst = score(tetris);
-		MCTS<Tetris> mcts (20.f);
+		MCTS<Tetris> mcts;
 		mcts.root_game = tetris;
 		mcts.root_game.depleted = true;
 
