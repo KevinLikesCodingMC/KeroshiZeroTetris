@@ -111,6 +111,19 @@ struct MCTS {
 		}
 		return id;
 	}
+
+	std :: vector<float> get_P() {
+		if (root == nullptr) return {};
+
+		int n = root -> n;
+		std :: vector P(n, 0.f);
+
+		for (int i = 0; i < n; i ++) {
+			P[i] = static_cast<float>(root -> N[i]) / root -> Sum_N;
+		}
+
+		return P;
+	}
 };
 
 #endif //KEROSHIZEROTETRIS_MCTS_H
