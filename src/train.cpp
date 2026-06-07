@@ -112,6 +112,11 @@ TrainContext :: predict_batch
 	auto info_t = Converter :: to_info(t);
 	auto pos_t = Converter :: to_pos(t);
 
+	board_t = board_t.to(device);
+	seq_t = seq_t.to(device);
+	info_t = info_t.to(device);
+	pos_t = pos_t.to(device);
+
 	model.eval();
 
 	auto output = model.forward({
