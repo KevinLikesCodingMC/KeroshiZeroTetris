@@ -1,0 +1,1 @@
+cmake-build-release/trainer model/default.pt empty buffer/1 10 32 8 32

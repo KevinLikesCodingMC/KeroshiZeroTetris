@@ -78,6 +78,16 @@ add_executable(
 		src/buffer.cpp
 )
 
+add_executable(
+		trainer
+		src/trainer.cpp
+		src/model_loader.cpp
+		src/train.cpp
+		src/converter.cpp
+		src/buffer.cpp
+)
+target_link_libraries(trainer "${TORCH_LIBRARIES}")
+
 install(
 		TARGETS
 		test_mino
@@ -88,6 +98,7 @@ install(
 		test_model_input
 		test_mcts_tetris
 		test_buffer
+		trainer
 		DESTINATION
 		bin
 )
