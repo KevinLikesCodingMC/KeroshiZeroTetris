@@ -24,6 +24,8 @@ namespace Converter {
 	at :: Tensor to_pos(const std :: vector<TetrisTrainData> & data);
 	at :: Tensor to_V(const std :: vector<TetrisTrainData> & data);
 	at :: Tensor to_P(const std :: vector<TetrisTrainData> & data);
+
+	TetrisTrainData to_train_data(const Tetris & t);
 };
 
 #endif //KEROSHIZEROTETRIS_CONVERTER_H

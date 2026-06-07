@@ -36,7 +36,7 @@ namespace Converter {
 		acc[0][1] = static_cast<float>(t.combo) / 10.f;
 		acc[0][2] = static_cast<float>(std :: log(t.b2b + 1));
 		acc[0][3] = static_cast<float>(t.pieces);
-		acc[0][4] = static_cast<float>(t.attack);
+		acc[0][4] = t.attack;
 		return tensor;
 	}
 
@@ -78,7 +78,7 @@ namespace Converter {
 
 
 	at :: Tensor to_board(const std :: vector<TetrisTrainData> & data) {
-		int batch = data.size();
+		int batch = static_cast<int>(data.size());
 		auto tensor = at :: zeros({batch, 1, 30, 10}, at :: kFloat);
 		auto acc = tensor.accessor<float, 4>();
 		for (int i = 0; i < batch; i ++) {
@@ -90,7 +90,7 @@ namespace Converter {
 	}
 
 	at :: Tensor to_seq(const std :: vector<TetrisTrainData> & data) {
-		int batch = data.size();
+		int batch = static_cast<int>(data.size());
 		auto tensor = at :: zeros({batch, 10}, at :: kLong);
 		auto acc = tensor.accessor<int64_t, 2>();
 		for (int i = 0; i < batch; i ++) {
@@ -101,7 +101,7 @@ namespace Converter {
 	}
 
 	at :: Tensor to_info(const std :: vector<TetrisTrainData> & data) {
-		int batch = data.size();
+		int batch = static_cast<int>(data.size());
 		auto tensor = at :: zeros({batch, 10}, at :: kFloat);
 		auto acc = tensor.accessor<float, 2>();
 		for (int i = 0; i < batch; i ++) {
@@ -112,7 +112,7 @@ namespace Converter {
 	}
 
 	at :: Tensor to_pos(const std :: vector<TetrisTrainData> & data) {
-		int batch = data.size();
+		int batch = static_cast<int>(data.size());
 
 		auto tensor = at :: zeros({batch, 128, 5}, at :: kLong);
 		auto acc = tensor.accessor<int64_t, 3>();
@@ -131,7 +131,7 @@ namespace Converter {
 	}
 
 	at :: Tensor to_V(const std :: vector<TetrisTrainData> & data) {
-		int batch = data.size();
+		int batch = static_cast<int>(data.size());
 
 		auto tensor = at :: zeros({batch, 1}, at :: kFloat);
 		auto acc = tensor.accessor<float, 2>();
@@ -144,7 +144,7 @@ namespace Converter {
 	}
 
 	at :: Tensor to_P(const std :: vector<TetrisTrainData> & data) {
-		int batch = data.size();
+		int batch = static_cast<int>(data.size());
 
 		auto tensor = at :: zeros({batch, 128}, at :: kFloat);
 		auto acc = tensor.accessor<float, 2>();
@@ -156,5 +156,54 @@ namespace Converter {
 		}
 
 		return tensor;
+	}
+
+	TetrisTrainData to_train_data(Tetris & t, const std :: vector<float> & P) {
+		TetrisTrainData data {};
+
+		for (int i = 0; i < 30; i ++) data.b[i] = t.b[i];
+
+		data.seq[0] = static_cast<int>(t.cur);
+		data.seq[1] = static_cast<int>(t.hold);
+		for (int i = 0; i < 5; i ++) data.seq[i + 2] = static_cast<int>(t.nxt[i]);
+
+		data.info[0] = t.can_hold ? 1.f : 0.f;
+		data.info[1] = static_cast<float>(t.combo) / 10.f;
+		data.info[2] = static_cast<float>(std :: log(t.b2b + 1));
+		data.info[3] = static_cast<float>(t.pieces);
+		data.info[4] = t.attack;
+
+		data.p = static_cast<int>(t.cur);
+
+		auto actions = t.legal();
+		data.len = static_cast<int>(actions.size());
+
+		if (data.len <= 128) {
+
+			data.P = P;
+			data.x.resize(data.len);
+			data.y.resize(data.len);
+			data.r.resize(data.len);
+
+			for (int i = 0; i < data.len; i ++) {
+				int u = actions[i];
+				if (u == 0) {
+					data.x[i] = 0;
+					data.y[i] = 0;
+					data.r[i] = 0;
+				}
+				else {
+					auto [x, y, r] = Action :: decode(u);
+					data.x[i] = x;
+					data.y[i] = y;
+					data.r[i] = r;
+				}
+			}
+		}
+		else {
+			data.len = 0;
+		}
+
+		return data;
 	}
 }
