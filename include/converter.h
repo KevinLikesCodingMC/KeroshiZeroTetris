@@ -18,6 +18,11 @@ namespace Converter {
 	at :: Tensor to_pos(const std :: vector<int> & actions, int cur);
 	at :: Tensor to_pos(Tetris & t);
 
+	at :: Tensor to_board(const std :: vector<Tetris> & t);
+	at :: Tensor to_seq(const std :: vector<Tetris> & t);
+	at :: Tensor to_info(const std :: vector<Tetris> & t);
+	at :: Tensor to_pos(std :: vector<Tetris> & t);
+
 	at :: Tensor to_board(const std :: vector<TetrisTrainData> & data);
 	at :: Tensor to_seq(const std :: vector<TetrisTrainData> & data);
 	at :: Tensor to_info(const std :: vector<TetrisTrainData> & data);

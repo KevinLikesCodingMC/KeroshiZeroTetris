@@ -76,6 +76,84 @@ namespace Converter {
 		return to_pos(t.legal(), static_cast<int>(t.cur));
 	}
 
+	at :: Tensor to_board(const std :: vector<Tetris> & t) {
+		int batch = t.size();
+		auto tensor = at :: zeros({batch, 1, 30, 10}, at :: kFloat);
+		auto acc = tensor.accessor<float, 4>();
+
+		for (int I = 0; I < batch; I ++) {
+			for (int i = 0; i < 30; i ++) for (int j = 0; j < 10; j ++) {
+				if (t[I].b[i] >> j & 1) acc[I][0][i][j] = 1.f;
+			}
+		}
+		return tensor;
+	}
+
+	at :: Tensor to_seq(const std :: vector<Tetris> & t) {
+		int batch = t.size();
+		auto tensor = at :: zeros({batch, 10}, at :: kLong);
+		auto acc = tensor.accessor<int64_t, 2>();
+
+		for (int I = 0; I < batch; I ++) {
+			acc[I][0] = static_cast<int64_t>(t[I].cur);
+			acc[I][1] = static_cast<int64_t>(t[I].hold);
+			for (int i = 0; i < 5; i ++) {
+				acc[I][i + 2] = static_cast<int64_t>(t[I].nxt[i]);
+			}
+		}
+		return tensor;
+	}
+
+	at :: Tensor to_info(const std :: vector<Tetris> & t) {
+		int batch = t.size();
+		auto tensor = at :: zeros({batch, 10}, at :: kFloat);
+		auto acc = tensor.accessor<float, 2>();
+
+		for (int I = 0; I < batch; I ++) {
+			acc[I][0] = t[I].can_hold ? 1.f : 0.f;
+			acc[I][1] = static_cast<float>(t[I].combo) / 10.f;
+			acc[I][2] = static_cast<float>(std :: log(t[I].b2b + 1));
+			acc[I][3] = static_cast<float>(t[I].pieces);
+			acc[I][4] = t[I].attack;
+		}
+		return tensor;
+	}
+
+	at :: Tensor to_pos(std :: vector<Tetris> & t) {
+		int batch = t.size();
+
+		auto tensor = at :: zeros({batch, 128, 5}, at :: kLong);
+		auto acc = tensor.accessor<int64_t, 3>();
+
+		for (int I = 0; I < batch; I ++) {
+			auto actions = t[I].legal();
+			int n = static_cast<int>(actions.size());
+			if (n > 128 || t[I].is_leaf()) continue;
+
+			int cur = static_cast<int>(t[I].cur);
+
+			for (int i = 0; i < n; i ++) {
+				int u = actions[i];
+				if (u == 0) {
+					acc[I][i][0] = 0;
+					acc[I][i][1] = 0;
+					acc[I][i][2] = 0;
+					acc[I][i][3] = 0;
+					acc[I][i][4] = 1;
+				}
+				else {
+					auto [x, y, r] = Action :: decode(u);
+					acc[I][i][0] = x;
+					acc[I][i][1] = y;
+					acc[I][i][2] = r;
+					acc[I][i][3] = cur;
+					acc[I][i][4] = 1;
+				}
+			}
+		}
+
+		return tensor;
+	}
 
 	at :: Tensor to_board(const std :: vector<TetrisTrainData> & data) {
 		int batch = static_cast<int>(data.size());
