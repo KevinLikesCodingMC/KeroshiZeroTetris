@@ -26,6 +26,9 @@ struct TrainContext {
 	std :: pair<std :: vector<float>, std :: vector<std :: vector<float>>>
 	predict_batch
 	(std :: vector<Tetris> & t);
+
+	void save(const std :: string & name);
+	void save();
 };
 
 #endif //KEROSHIZEROTETRIS_TRAIN_H

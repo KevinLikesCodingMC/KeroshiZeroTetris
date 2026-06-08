@@ -188,5 +188,7 @@ int main(int argc, char * argv []) {
 		}
 	}
 
+	trainer.save();
+
 	return 0;
 }

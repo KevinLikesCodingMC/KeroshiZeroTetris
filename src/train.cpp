@@ -151,3 +151,29 @@ TrainContext :: predict_batch
 
 	return {V, P};
 }
+
+void TrainContext :: save(const std :: string & name) {
+	std :: string model_path = name + ".pt";
+	std :: string opt_path = name + ".opt";
+
+	try {
+		torch :: jit :: Module model_s = model;
+		model_s.to(torch :: kCPU);
+
+		model_s.save(model_path);
+		torch :: save(* optimizer, opt_path);
+
+		Message :: log(Message :: INFO, true,
+			"Saved!");
+	}
+	catch(const c10 :: Error & e) {
+		Message :: log(Message :: ERROR, true,
+			"Saving Failed.");
+		Message :: log(Message :: ERROR, true,
+			"Error: ", e.what());
+	}
+}
+
+void TrainContext :: save() {
+	save(std :: to_string(std :: time(nullptr)));
+}
