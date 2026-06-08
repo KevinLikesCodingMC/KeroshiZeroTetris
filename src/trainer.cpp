@@ -112,7 +112,12 @@ int main(int argc, char * argv []) {
 			}
 		}
 
-		for (int _ = 0; _ < simu; _ ++) {
+		for (int K = 0; K < simu; K ++) {
+			if (K == 1) {
+				for (int I = 0; I < batch; I ++)
+					mcts[I].noise();
+			}
+
 			std :: vector<Tetris> g(batch);
 			for (int I = 0; I < batch; I ++) {
 				g[I] = mcts[I].playout_select();
