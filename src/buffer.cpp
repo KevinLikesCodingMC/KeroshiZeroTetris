@@ -101,6 +101,7 @@ void TetrisBuffer :: add_game(const TetrisTrainData & data) {
 		std :: exit(EXIT_FAILURE);
 	}
 
+	bin_ofs.seekp(0, std :: ios :: end);
 	uint64_t offset = bin_ofs.tellp();
 
 	bin_ofs.write(reinterpret_cast<const char *> (data.b), sizeof(data.b));
