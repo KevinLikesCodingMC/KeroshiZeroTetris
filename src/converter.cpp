@@ -82,6 +82,8 @@ namespace Converter {
 		auto acc = tensor.accessor<float, 4>();
 
 		for (int I = 0; I < batch; I ++) {
+			if (t[I].is_over()) continue;
+
 			for (int i = 0; i < 30; i ++) for (int j = 0; j < 10; j ++) {
 				if (t[I].b[i] >> j & 1) acc[I][0][i][j] = 1.f;
 			}
@@ -95,6 +97,8 @@ namespace Converter {
 		auto acc = tensor.accessor<int64_t, 2>();
 
 		for (int I = 0; I < batch; I ++) {
+			if (t[I].is_over()) continue;
+
 			acc[I][0] = static_cast<int64_t>(t[I].cur);
 			acc[I][1] = static_cast<int64_t>(t[I].hold);
 			for (int i = 0; i < 5; i ++) {
@@ -110,6 +114,8 @@ namespace Converter {
 		auto acc = tensor.accessor<float, 2>();
 
 		for (int I = 0; I < batch; I ++) {
+			if (t[I].is_over()) continue;
+
 			acc[I][0] = t[I].can_hold ? 1.f : 0.f;
 			acc[I][1] = static_cast<float>(t[I].combo) / 10.f;
 			acc[I][2] = static_cast<float>(std :: log(t[I].b2b + 1));
@@ -126,9 +132,11 @@ namespace Converter {
 		auto acc = tensor.accessor<int64_t, 3>();
 
 		for (int I = 0; I < batch; I ++) {
+			if (t[I].is_leaf()) continue;
+
 			auto actions = t[I].legal();
 			int n = static_cast<int>(actions.size());
-			if (n > 128 || t[I].is_leaf()) continue;
+			if (n > 128) continue;
 
 			int cur = static_cast<int>(t[I].cur);
 
