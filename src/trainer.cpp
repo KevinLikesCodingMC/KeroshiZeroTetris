@@ -168,7 +168,7 @@ int main(int argc, char * argv []) {
 
 				train_data[I].clear();
 
-				if (buffer.tot >= 50) {
+				if (buffer.tot >= 500) {
 					std :: vector<TetrisTrainData> samples;
 					for (int _ = 0; _ < sample; _ ++) {
 						samples.push_back(buffer.sample());
@@ -176,12 +176,15 @@ int main(int argc, char * argv []) {
 
 					float loss = trainer.train(samples);
 					Message :: log(Message :: INFO, true,
-						"Loss: ", loss, " | Attack: ", tetris[I].attack
+						"Game: ", games,
+						" | Loss: ", loss,
+						" | Attack: ", tetris[I].attack
 					);
 				}
 				else {
 					Message :: log(Message :: INFO, true,
-						"Attack: ", tetris[I].attack
+						"Game: ", games,
+						" | Attack: ", tetris[I].attack
 					);
 				}
 
