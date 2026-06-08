@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 #include <cmath>
+#include <random>
 
 template < typename G >
 concept GameState = requires ( G g , int action) {
@@ -123,6 +124,26 @@ struct MCTS {
 		}
 
 		return P;
+	}
+
+	void noise(float alpha = 0.3f, float epsilon = 0.25f) {
+		if (root == nullptr) return;
+
+		static std :: mt19937 rnd(std :: random_device{}());
+		std :: gamma_distribution d(alpha, 1.f);
+
+		int n = root -> n;
+		float sum = 0;
+		std :: vector<float> D(n);
+		for (int i = 0; i < n; i ++) {
+			D[i] = d(rnd);
+			sum += D[i];
+		}
+
+		for (int i = 0; i < n; i ++) {
+			D[i] /= sum;
+			root -> P[i] = (1.f - epsilon) * root -> P[i] + epsilon * D[i];
+		}
 	}
 };
 
