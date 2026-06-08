@@ -27,6 +27,15 @@ float get_V(const Tetris & t) {
 	return t.attack;
 }
 
+float get_ex_V(const Tetris & t) {
+	int top = 30;
+	for (int y = 29; y >= 0; y --) {
+		if (t.b[y]) break;
+		top = y;
+	}
+	return (20 - top) * 0.7f;
+}
+
 int main(int argc, char * argv []) {
 	if (argc < 4) {
 		std :: cout << "Usage: " << argv[0]
@@ -77,7 +86,7 @@ int main(int argc, char * argv []) {
 		true, true
 	);
 
-	TetrisBuffer buffer(data_path);
+	TetrisBuffer buffer(data_path, 10000, 100000);
 
 	std :: vector<Tetris> tetris(batch);
 	std :: vector<std :: vector<TetrisTrainData>> train_data(batch);
@@ -96,7 +105,11 @@ int main(int argc, char * argv []) {
 			}
 
 			auto [V, P] = trainer.predict_batch(g);
+
 			fst = V;
+			for (int I = 0; I < batch; I ++) {
+				fst[I] += get_ex_V(g[I]);
+			}
 		}
 
 		for (int _ = 0; _ < simu; _ ++) {
@@ -106,12 +119,12 @@ int main(int argc, char * argv []) {
 			}
 			auto [V, P_t] = trainer.predict_batch(g);
 			for (int I = 0; I < batch; I ++) {
-				float Q = 0;
-				if (is_end(g[I]) || g[I].is_over()) {
-					Q = get_V(g[I]);
+				float Q = get_ex_V(g[I]) - fst[I];
+				if (is_end(g[I])) {
+					Q += get_V(g[I]);
 				}
 				else {
-					Q = V[I] - fst[I];
+					Q += V[I];
 				}
 
 				if (g[I].is_leaf()) {
