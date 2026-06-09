@@ -350,6 +350,8 @@ struct Tetris {
 		std :: queue<std :: tuple<int, int, int>> q;
 
 		auto [sx, sy] = get_spawn();
+		int st = sy << 6 | sx << 2;
+		vis[st] = true;
 		q.emplace(sx, sy, 0);
 
 		constexpr int dx[] = {0, - 1, 1};
@@ -366,8 +368,7 @@ struct Tetris {
 			q.pop();
 
 			int u = y << 6 | x << 2 | r;
-			if (vis[u]) continue;
-			vis[u] = true;
+
 			if (is_grounded(x, y, r)) {
 				res.push_back(Action :: place(x, y, r));
 			}
