@@ -61,8 +61,14 @@ struct Tetris {
 
 	bool depleted;
 
+	bool record_seq;
+	std :: shared_ptr<std :: string> r_seq;
+
 	Tetris() {
 		depleted = false;
+
+		record_seq = false;
+		r_seq = nullptr;
 
 		bag_pos = 0;
 		for (int i = 0; i < 7; i ++) {
@@ -101,6 +107,13 @@ struct Tetris {
 		if (bag_pos == 0) {
 			bag_pos = 7;
 			std :: shuffle(bag, bag + 7, rnd);
+
+			if (record_seq) {
+				for (int i = 6; i >= 0; i --) {
+					const int p = static_cast<int>(bag[i]);
+					* r_seq += "0IJLOSTZ"[p];
+				}
+			}
 		}
 		return bag[-- bag_pos];
 	}
