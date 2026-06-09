@@ -376,7 +376,11 @@ struct Tetris {
 				int X = x + dx[d];
 				int Y = y + dy[d];
 				if (! is_legal(X, Y, r)) continue;
-				q.emplace(X, Y, r);
+				int v = Y << 6 | X << 2 | r;
+				if (! vis[v]) {
+					vis[v] = true;
+					q.emplace(X, Y, r);
+				}
 			}
 
 			if (cur == Piece :: O) continue;
@@ -386,7 +390,11 @@ struct Tetris {
 				int X = x + h[0];
 				int Y = y + h[1];
 				if (is_legal(X, Y, R)) {
-					q.emplace(X, Y, R);
+					int v = Y << 6 | X << 2 | R;
+					if (! vis[v]) {
+						vis[v] = true;
+						q.emplace(X, Y, R);
+					}
 					break;
 				}
 			}
@@ -396,7 +404,11 @@ struct Tetris {
 				int X = x + h[0];
 				int Y = y + h[1];
 				if (is_legal(X, Y, R)) {
-					q.emplace(X, Y, R);
+					int v = Y << 6 | X << 2 | R;
+					if (! vis[v]) {
+						vis[v] = true;
+						q.emplace(X, Y, R);
+					}
 					break;
 				}
 			}
@@ -406,7 +418,11 @@ struct Tetris {
 				int X = x + h[0];
 				int Y = y + h[1];
 				if (is_legal(X, Y, R)) {
-					q.emplace(X, Y, R);
+					int v = Y << 6 | X << 2 | R;
+					if (! vis[v]) {
+						vis[v] = true;
+						q.emplace(X, Y, R);
+					}
 					break;
 				}
 			}
