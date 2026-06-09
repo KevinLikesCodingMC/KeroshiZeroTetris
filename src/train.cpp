@@ -118,6 +118,7 @@ TrainContext :: predict_batch
 	pos_t = pos_t.to(device);
 
 	model.eval();
+	torch :: NoGradGuard no_grad;
 
 	auto output = model.forward({
 		board_t,
