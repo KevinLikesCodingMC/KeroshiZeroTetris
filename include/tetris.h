@@ -431,6 +431,113 @@ struct Tetris {
 		return res;
 	}
 
+	std :: string get_keys(int action) {
+		if (game_over) return "";
+
+		if (action == Action :: hold()) return "C";
+
+		std :: vector<bool> vis(1 << 11);
+		std :: vector<std :: pair<int, char>> pre(1 << 11);
+		std :: queue<std :: tuple<int, int, int>> q;
+
+		auto [sx, sy] = get_spawn();
+		int st = sy << 6 | sx << 2;
+		vis[st] = true;
+		q.emplace(sx, sy, 0);
+
+		constexpr int dx[] = {0, - 1, 1};
+		constexpr int dy[] = {- 1, 0, 0};
+
+		int piece = static_cast<int>(cur);
+
+		auto kicks_cw = SRSP :: kicks_cw[piece];
+		auto kicks_ccw = SRSP :: kicks_ccw[piece];
+		auto kicks_180 = SRSP :: kicks_180[piece];
+
+		while (! q.empty()) {
+			auto [x, y, r] = q.front();
+			q.pop();
+
+			int u = y << 6 | x << 2 | r;
+
+			for (int d = 0; d < 3; d ++) {
+				int X = x + dx[d];
+				int Y = y + dy[d];
+				if (! is_legal(X, Y, r)) continue;
+				int v = Y << 6 | X << 2 | r;
+				if (! vis[v]) {
+					vis[v] = true;
+					pre[v] = {u, "dlr"[d]};
+					q.emplace(X, Y, r);
+				}
+			}
+
+			if (cur == Piece :: O) continue;
+
+			for (const auto & h : kicks_cw[r]) {
+				int R = (r + 1) & 3;
+				int X = x + h[0];
+				int Y = y + h[1];
+				if (is_legal(X, Y, R)) {
+					int v = Y << 6 | X << 2 | R;
+					if (! vis[v]) {
+						vis[v] = true;
+						pre[v] = {u, 'u'};
+						q.emplace(X, Y, R);
+					}
+					break;
+				}
+			}
+
+			for (const auto & h : kicks_ccw[r]) {
+				int R = (r + 3) & 3;
+				int X = x + h[0];
+				int Y = y + h[1];
+				if (is_legal(X, Y, R)) {
+					int v = Y << 6 | X << 2 | R;
+					if (! vis[v]) {
+						vis[v] = true;
+						pre[v] = {u, 'Z'};
+						q.emplace(X, Y, R);
+					}
+					break;
+				}
+			}
+
+			for (const auto & h : kicks_180[r]) {
+				int R = (r + 2) & 3;
+				int X = x + h[0];
+				int Y = y + h[1];
+				if (is_legal(X, Y, R)) {
+					int v = Y << 6 | X << 2 | R;
+					if (! vis[v]) {
+						vis[v] = true;
+						pre[v] = {u, 'A'};
+						q.emplace(X, Y, R);
+					}
+					break;
+				}
+			}
+		}
+
+		action --;
+		if (! vis[action]) return "";
+
+		std :: string res = "";
+
+		while (action != st) {
+			auto [u, c] = pre[action];
+			res += c;
+			action = u;
+		}
+
+		std :: reverse(res.begin(), res.end());
+
+		res += "s";
+
+		return res;
+	}
+
 	bool is_over() const {
 		return game_over;
 	}
