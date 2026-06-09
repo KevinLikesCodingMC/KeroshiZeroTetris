@@ -6,5 +6,9 @@ bin/
 tex/main.aux
 tex/main.log
 tex/main.synctex.gz
-
 #tex/main.pdf
+
+tex/main_pre*
+
+buffer/
+
