@@ -11,6 +11,8 @@ namespace Converter {
 
 	at :: Tensor to_board(const Tetris & t) {
 		auto tensor = at :: zeros({1, 1, 30, 10}, at :: kFloat);
+		if (t.is_over()) return tensor;
+
 		auto acc = tensor.accessor<float, 4>();
 		for (int i = 0; i < 30; i ++) for (int j = 0; j < 10; j ++) {
 			if (t.b[i] >> j & 1) acc[0][0][i][j] = 1.f;
@@ -20,6 +22,8 @@ namespace Converter {
 
 	at :: Tensor to_seq(const Tetris & t) {
 		auto tensor = at :: zeros({1, 10}, at :: kLong);
+		if (t.is_over()) return tensor;
+
 		auto acc = tensor.accessor<int64_t, 2>();
 		acc[0][0] = static_cast<int64_t>(t.cur);
 		acc[0][1] = static_cast<int64_t>(t.hold);
@@ -31,6 +35,8 @@ namespace Converter {
 
 	at :: Tensor to_info(const Tetris & t) {
 		auto tensor = at :: zeros({1, 10}, at :: kFloat);
+		if (t.is_over()) return tensor;
+
 		auto acc = tensor.accessor<float, 2>();
 		acc[0][0] = t.can_hold ? 1.f : 0.f;
 		acc[0][1] = static_cast<float>(t.combo) / 10.f;
@@ -40,17 +46,17 @@ namespace Converter {
 		return tensor;
 	}
 
-	at :: Tensor to_pos(const std :: vector<int> & actions, int cur) {
+	at :: Tensor to_pos(Tetris & t) {
+		auto tensor = at :: zeros({1, 128, 5}, at :: kLong);
+		if (t.is_leaf()) return tensor;
+
+		auto actions = t.legal();
 		int n = static_cast<int>(actions.size());
 
-		if (n > 128) {
-			Message :: log(Message :: ERROR, true,
-				"Action size is more than 128."
-			);
-			std :: exit(EXIT_FAILURE);
-		}
+		if (n > 128) return tensor;
 
-		auto tensor = at :: zeros({1, 128, 5}, at :: kLong);
+		int cur = static_cast<int>(t.cur);
+
 		auto acc = tensor.accessor<int64_t, 3>();
 		for (int i = 0; i < n; i ++) {
 			int u = actions[i];
@@ -71,9 +77,6 @@ namespace Converter {
 			}
 		}
 		return tensor;
-	}
-	at :: Tensor to_pos(Tetris & t) {
-		return to_pos(t.legal(), static_cast<int>(t.cur));
 	}
 
 	at :: Tensor to_board(const std :: vector<Tetris> & t) {
