@@ -12,6 +12,7 @@
 
 #include <random>
 #include <queue>
+#include <memory>
 
 struct Placement {
 	Piece piece;
@@ -22,6 +23,15 @@ struct Placement {
 };
 
 struct Action {
+	/*
+		Action
+		hold: 0
+		place: (x << 7 | y << 2 | r) + 1
+		y [0, 32)
+		x [0, 12)
+		action [0, 1537)
+	*/
+
 	struct ActionDecode {
 		int x, y, r;
 	};
@@ -29,14 +39,14 @@ struct Action {
 		return 0;
 	}
 	static int place(int x, int y, int r) {
-		return (y << 6 | x << 2 | r) + 1;
+		return (x << 7 | y << 2 | r) + 1;
 	}
 	static ActionDecode decode(int u) {
 		if (u <= 0) return {0, 0, 0};
 		u --;
 		return {
-			u >> 2 & 15,
-			u >> 6,
+			u >> 7,
+			u >> 2 & 31,
 			u & 3
 		};
 	}
@@ -355,11 +365,11 @@ struct Tetris {
 		if (game_over) return res;
 		if (can_hold) res.push_back(Action :: hold());
 
-		std :: vector<bool> vis(1 << 11);
+		std :: vector<bool> vis(1537);
 		std :: queue<std :: tuple<int, int, int>> q;
 
 		auto [sx, sy] = get_spawn();
-		int st = sy << 6 | sx << 2;
+		int st = Action :: place(sx, sy, 0);
 		vis[st] = true;
 		q.emplace(sx, sy, 0);
 
@@ -376,8 +386,6 @@ struct Tetris {
 			auto [x, y, r] = q.front();
 			q.pop();
 
-			int u = y << 6 | x << 2 | r;
-
 			if (is_grounded(x, y, r)) {
 				res.push_back(Action :: place(x, y, r));
 			}
@@ -386,7 +394,7 @@ struct Tetris {
 				int X = x + dx[d];
 				int Y = y + dy[d];
 				if (! is_legal(X, Y, r)) continue;
-				int v = Y << 6 | X << 2 | r;
+				int v = Action :: place(X, Y, r);
 				if (! vis[v]) {
 					vis[v] = true;
 					q.emplace(X, Y, r);
@@ -400,7 +408,7 @@ struct Tetris {
 				int X = x + h[0];
 				int Y = y + h[1];
 				if (is_legal(X, Y, R)) {
-					int v = Y << 6 | X << 2 | R;
+					int v = Action :: place(X, Y, R);
 					if (! vis[v]) {
 						vis[v] = true;
 						q.emplace(X, Y, R);
@@ -414,7 +422,7 @@ struct Tetris {
 				int X = x + h[0];
 				int Y = y + h[1];
 				if (is_legal(X, Y, R)) {
-					int v = Y << 6 | X << 2 | R;
+					int v = Action :: place(X, Y, R);
 					if (! vis[v]) {
 						vis[v] = true;
 						q.emplace(X, Y, R);
@@ -428,7 +436,7 @@ struct Tetris {
 				int X = x + h[0];
 				int Y = y + h[1];
 				if (is_legal(X, Y, R)) {
-					int v = Y << 6 | X << 2 | R;
+					int v = Action :: place(X, Y, R);
 					if (! vis[v]) {
 						vis[v] = true;
 						q.emplace(X, Y, R);
@@ -445,12 +453,12 @@ struct Tetris {
 
 		if (action == Action :: hold()) return "C";
 
-		std :: vector<bool> vis(1 << 11);
+		std :: vector<bool> vis(1537);
 		std :: vector<std :: pair<int, char>> pre(1 << 11);
 		std :: queue<std :: tuple<int, int, int>> q;
 
 		auto [sx, sy] = get_spawn();
-		int st = sy << 6 | sx << 2;
+		int st = Action :: place(sx, sy, 0);
 		vis[st] = true;
 		q.emplace(sx, sy, 0);
 
@@ -467,13 +475,13 @@ struct Tetris {
 			auto [x, y, r] = q.front();
 			q.pop();
 
-			int u = y << 6 | x << 2 | r;
+			int u = Action :: place(x, y, r);
 
 			for (int d = 0; d < 3; d ++) {
 				int X = x + dx[d];
 				int Y = y + dy[d];
 				if (! is_legal(X, Y, r)) continue;
-				int v = Y << 6 | X << 2 | r;
+				int v = Action :: place(X, Y, r);
 				if (! vis[v]) {
 					vis[v] = true;
 					pre[v] = {u, "dlr"[d]};
@@ -488,7 +496,7 @@ struct Tetris {
 				int X = x + h[0];
 				int Y = y + h[1];
 				if (is_legal(X, Y, R)) {
-					int v = Y << 6 | X << 2 | R;
+					int v = Action :: place(X, Y, R);
 					if (! vis[v]) {
 						vis[v] = true;
 						pre[v] = {u, 'u'};
@@ -503,7 +511,7 @@ struct Tetris {
 				int X = x + h[0];
 				int Y = y + h[1];
 				if (is_legal(X, Y, R)) {
-					int v = Y << 6 | X << 2 | R;
+					int v = Action :: place(X, Y, R);
 					if (! vis[v]) {
 						vis[v] = true;
 						pre[v] = {u, 'Z'};
@@ -518,7 +526,7 @@ struct Tetris {
 				int X = x + h[0];
 				int Y = y + h[1];
 				if (is_legal(X, Y, R)) {
-					int v = Y << 6 | X << 2 | R;
+					int v = Action :: place(X, Y, R);
 					if (! vis[v]) {
 						vis[v] = true;
 						pre[v] = {u, 'A'};
@@ -532,7 +540,7 @@ struct Tetris {
 		action --;
 		if (! vis[action]) return "";
 
-		std :: string res = "";
+		std :: string res;
 
 		while (action != st) {
 			auto [u, c] = pre[action];
