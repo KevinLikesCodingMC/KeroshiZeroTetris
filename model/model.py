@@ -2,26 +2,54 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-class ResBlock(nn.Module):
-	def __init__(self, channel):
+class FiLMLayer(nn.Module):
+	def __init__(self, in_size, channel):
 		super().__init__()
-		self.conv = nn.Sequential(
-			nn.Conv2d(channel, channel, 3, 1, 1, bias = False),
-			nn.BatchNorm2d(channel),
-			nn.ReLU(),
-			nn.Conv2d(channel, channel, 3, 1, 1, bias = False),
-			nn.BatchNorm2d(channel),
-		)
 
-	def forward(self, x):
-		return F.relu(self.conv(x) + x)
+		self.gamma = nn.Linear(in_size, channel)
+		self.beta = nn.Linear(in_size, channel)
+
+		nn.init.zeros_(self.gamma.weight)
+		nn.init.zeros_(self.beta.weight)
+		nn.init.zeros_(self.gamma.bias)
+		nn.init.zeros_(self.beta.bias)
+
+	def forward(self, x, cond):
+		g = self.gamma(cond)
+		b = self.beta(cond)
+		g = g.unsqueeze(- 1).unsqueeze(- 1)
+		b = b.unsqueeze(- 1).unsqueeze(- 1)
+		return (1.0 + g) * x + b
+
+
+class ResBlock(nn.Module):
+	def __init__(self, channel, in_size):
+		super().__init__()
+
+		self.conv1 = nn.Conv2d(channel, channel, 3, 1, 1, bias = False)
+		self.conv2 = nn.Conv2d(channel, channel, 3, 1, 1, bias = False)
+		self.bn1 = nn.BatchNorm2d(channel)
+		self.bn2 = nn.BatchNorm2d(channel)
+		self.film1 = FiLMLayer(in_size, channel)
+		self.film2 = FiLMLayer(in_size, channel)
+
+	def forward(self, x, cond):
+		y = F.relu(self.bn1(x))
+		y = self.conv1(y)
+		y = self.film1(y, cond)
+
+		y = F.relu(self.bn2(y))
+		y = self.conv2(y)
+		y = self.film2(y, cond)
+
+		return x + y
 
 
 class SeqEncoder(nn.Module):
-	def __init__(self, piece_embedding):
+	def __init__(self):
 		super().__init__()
 
-		self.piece_embedding = piece_embedding
+		self.piece_embedding = nn.Embedding(8, 16)
 		self.pos_embedding = nn.Embedding(10, 16)
 
 		encoder_layer = nn.TransformerEncoderLayer(
@@ -34,48 +62,19 @@ class SeqEncoder(nn.Module):
 		)
 		self.transformer = nn.TransformerEncoder(encoder_layer, num_layers = 1)
 
-		self.linear = nn.Linear(160, 64)
+		self.norm = nn.LayerNorm(16)
 
 	def forward(self, seq):
 		batch = seq.size(0)
 		seq = self.piece_embedding(seq)
-		pos = torch.arange(0, 10, device = seq.device).view(1, 10).expand(batch, 10)
+		pos = torch.arange(0, 10, dtype = torch.long, device = seq.device).view(1, 10).expand(batch, 10)
 		pos = self.pos_embedding(pos)
-		seq = seq + pos
-		seq = self.transformer(seq)
+		seq_t = seq + pos
+		seq_t = self.transformer(seq_t)
+		seq = self.norm(seq + seq_t)
 		seq = seq.view(batch, 160)
-		seq = F.relu(self.linear(seq))
+
 		return seq
-
-
-class PosEncoder(nn.Module):
-	def __init__(self, piece_embedding):
-		super().__init__()
-
-		self.xy_linear = nn.Linear(2, 8)
-
-		self.piece_embedding = piece_embedding
-		self.rotate_embedding = nn.Embedding(4, 8)
-
-		self.pos_linear = nn.Linear(32, 32)
-
-	def forward(self, pos):
-		x, y, r, p, mask = pos.unbind(dim = - 1)
-
-		x = x.float().unsqueeze(- 1) / 10.0
-		y = y.float().unsqueeze(- 1) / 20.0
-		xy = torch.cat((x, y), dim = - 1)
-		xy = F.relu(self.xy_linear(xy))
-
-		r = r.long()
-		p = p.long()
-		r = self.rotate_embedding(r)
-		p = self.piece_embedding(p)
-
-		pos = torch.cat((xy, r, p), dim = - 1)
-		pos = F.relu(self.pos_linear(pos))
-
-		return pos, mask
 
 
 class KeroshiZeroNet(nn.Module):
@@ -84,91 +83,77 @@ class KeroshiZeroNet(nn.Module):
 
 		# Board (Batch, 1, 30, 10)
 		self.first_conv = nn.Sequential(
-			nn.Conv2d(1, 32, 3, 1, 1, bias = False),
-			nn.BatchNorm2d(32),
+			nn.Conv2d(1, 64, 3, 1, 1, bias = False),
+			nn.BatchNorm2d(64),
 			nn.ReLU(),
-			nn.Conv2d(32, 32, 3, 1, 1, bias = False),
-			nn.BatchNorm2d(32),
+			nn.Conv2d(64, 64, 3, 1, 1, bias = False),
+			nn.BatchNorm2d(64),
 			nn.ReLU(),
 		)
 
-		self.res = nn.Sequential(
-			* [ResBlock(64) for _ in range(res_blocks)]
-		)
+		self.res = nn.ModuleList([
+			ResBlock(64, 256) for _ in range(res_blocks)
+		])
+
+		self.last_bn = nn.BatchNorm2d(64)
 
 		self.last_conv = nn.Sequential(
-			nn.Conv2d(64, 1, 1, bias = False),
-			nn.BatchNorm2d(1),
+			nn.Conv2d(64, 4, 1, bias = False),
+			nn.BatchNorm2d(4),
 			nn.ReLU(),
 			nn.Flatten(),
 		)
 
 		# Meta (10 seq and 10 info)
-		self.piece_embedding = nn.Embedding(8, 16)
-
-		self.seq_encoder = SeqEncoder(self.piece_embedding)
+		self.seq_encoder = SeqEncoder()
 
 		self.info_linear = nn.Linear(10, 32)
-		self.meta_compress = nn.Linear(96, 32)
+		self.meta_linear = nn.Linear(160 + 32, 256 - 32)
 
 		self.value = nn.Sequential(
-			nn.Linear(332, 128),
+			nn.Linear(1456, 256),
 			nn.ReLU(),
-			nn.Linear(128, 1),
+			nn.Linear(256, 1),
 		)
 
-		# Pos (Batch, 128, 5)
-		self.pos_encoder = PosEncoder(self.piece_embedding)
-
 		self.policy = nn.Sequential(
-			nn.Linear(364, 32),
+			nn.Linear(1456, 512),
 			nn.ReLU(),
-			nn.Linear(32, 1),
+			nn.Linear(512, 1537),
 		)
 
 	# board (Batch, 1, 30, 10)
 	# seq (Batch, 10)
 	# info (Batch, 10)
-	# pos (Batch, 128, 5)
-	def forward(self, board, seq, info, pos):
-		batch = board.size(0)
-
+	def forward(self, board, seq, info, mask):
 		board = self.first_conv(board)
-		# board (Batch, 32, 30, 10)
+		# board (Batch, 64, 30, 10)
 
 		seq = self.seq_encoder(seq)
-		# seq (Batch, 64)
+		# seq (Batch, 160)
 
 		info = F.relu(self.info_linear(info))
 		# info (Batch, 32)
 
 		meta = torch.cat((seq, info), dim = 1)
-		# meta (Batch, 96)
+		# meta (Batch, 160 + 32)
 
-		meta = F.relu(self.meta_compress(meta))
-		# meta (Batch 32)
+		meta = F.relu(self.meta_linear(meta))
+		meta = torch.cat((meta, info), dim = 1)
+		# meta (Batch 256)
 
-		meta_f = meta.view(- 1, 32, 1, 1).expand(- 1, - 1, 30, 10)
-		board = torch.cat((board, meta_f), dim = 1)
-		# board (Batch, 64, 30, 10)
+		for block in self.res:
+			board = block(board, meta)
 
-		board = self.res(board)
+		board = F.relu(self.last_bn(board))
 		board = self.last_conv(board)
-		# board (Batch, 300)
+		# board (Batch, 1200)
 
 		final = torch.cat((board, meta), dim = 1)
-		# (Batch, 332)
+		# (Batch, 1200 + 256 = 1456)
 
 		value = self.value(final)
-
-		final = final.unsqueeze(1).expand(- 1, 128, - 1)
-		pos, mask = self.pos_encoder(pos)
-		policy = torch.cat((final, pos), dim = - 1)
-		# policy (Batch, 128, 364)
-
-		policy = self.policy(policy)
-		policy = policy.squeeze(- 1)
-		# policy (Batch, 128)
+		policy = self.policy(final)
 
 		policy = policy.masked_fill(mask == 0, - 1e9)
 
