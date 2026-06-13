@@ -12,7 +12,7 @@ int main(int argc, char * argv []) {
 		std :: cout << "Usage: "
 					<< argv[0]
 					<< " <model.pt>"
-					<< "[ output / speed ]"
+					<< " [ output / speed ]"
 					<< std :: endl;
 		return 1;
 	}
@@ -41,14 +41,14 @@ int main(int argc, char * argv []) {
 		at :: Tensor board_t = Converter :: to_board(tetris).to(device);
 		at :: Tensor seq_t = Converter :: to_seq(tetris).to(device);
 		at :: Tensor info_t = Converter :: to_info(tetris).to(device);
-		at :: Tensor pos_t = Converter :: to_pos(tetris).to(device);
+		at :: Tensor mask_t = Converter :: to_mask(tetris).to(device);
 
 		timer.elapsed("Converter:");
 
 		std :: cout << board_t << std :: endl;
 		std :: cout << seq_t << std :: endl;
 		std :: cout << info_t << std :: endl;
-		std :: cout << pos_t << std :: endl;
+		std :: cout << mask_t << std :: endl;
 
 		timer.reset();
 
@@ -56,7 +56,7 @@ int main(int argc, char * argv []) {
 			board_t,
 			seq_t,
 			info_t,
-			pos_t,
+			mask_t,
 		}).toTuple();
 
 		at :: Tensor value_t = output -> elements()[0].toTensor();
@@ -86,7 +86,7 @@ int main(int argc, char * argv []) {
 		at :: Tensor board_t = Converter :: to_board(tetris).to(device);
 		at :: Tensor seq_t = Converter :: to_seq(tetris).to(device);
 		at :: Tensor info_t = Converter :: to_info(tetris).to(device);
-		at :: Tensor pos_t = Converter :: to_pos(tetris).to(device);
+		at :: Tensor mask_t = Converter :: to_mask(tetris).to(device);
 
 		timer.elapsed("Converter:");
 
@@ -95,7 +95,7 @@ int main(int argc, char * argv []) {
 				board_t,
 				seq_t,
 				info_t,
-				pos_t,
+				mask_t,
 			}).toTuple();
 
 			at :: Tensor value_t = output -> elements()[0].toTensor();
