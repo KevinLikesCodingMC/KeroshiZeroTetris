@@ -64,6 +64,12 @@ int main(int argc, char * argv []) {
 	Tetris tetris;
 	TetrisRender :: render(tetris);
 
+	tetris.record_seq = true;
+	tetris.r_seq = std :: make_shared<std :: string>();
+	tetris.refill();
+
+	std :: string keys = "";
+
 	while (! is_end(tetris)) {
 		MCTS<Tetris> mcts;
 		float fst;
@@ -72,6 +78,7 @@ int main(int argc, char * argv []) {
 			Tetris g = tetris;
 			mcts.root_game = tetris;
 			mcts.root_game.depleted = true;
+			mcts.root_game.record_seq = false;
 
 			auto [V, P] = predictor.predict(g);
 
@@ -115,10 +122,14 @@ int main(int argc, char * argv []) {
 		int id = mcts.get_best();
 		int u = mcts.root -> a[id];
 
+		keys += tetris.get_keys(u);
 		tetris.step(u);
 
 		TetrisRender :: render(tetris);
 	}
+
+	std :: cout << * tetris.r_seq << std :: endl;
+	std :: cout << keys << std :: endl;
 
 	return 0;
 }

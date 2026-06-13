@@ -97,6 +97,15 @@ struct Tetris {
 		combo_func = KeroshiCombo :: stage1;
 	}
 
+	void refill() {
+		bag_pos = 0;
+		hold = Piece :: EMPTY;
+		cur = get_next();
+		for (int i = 0; i < 5; i ++) {
+			nxt[i] = get_next();
+		}
+	}
+
 	Piece get_next() {
 		static std :: mt19937 rnd(std :: random_device{}());
 
