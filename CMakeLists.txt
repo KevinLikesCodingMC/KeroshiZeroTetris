@@ -88,6 +88,21 @@ add_executable(
 )
 target_link_libraries(trainer "${TORCH_LIBRARIES}")
 
+add_executable(
+		demo
+		src/demo.cpp
+		src/predict.cpp
+		src/model_loader.cpp
+		src/converter.cpp
+		src/render.cpp
+)
+target_link_libraries(demo "${TORCH_LIBRARIES}")
+
+add_executable(
+		control
+		src/control.cpp
+)
+
 install(
 		TARGETS
 		test_mino
