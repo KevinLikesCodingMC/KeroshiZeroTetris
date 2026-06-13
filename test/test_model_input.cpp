@@ -12,7 +12,7 @@ int main(int argc, char * argv []) {
 		std :: cout << "Usage: "
 					<< argv[0]
 					<< " <model.pt>"
-					<< " [ output / speed ]"
+					<< " [ output | speed | speed_batch ]"
 					<< std :: endl;
 		return 1;
 	}
@@ -89,6 +89,63 @@ int main(int argc, char * argv []) {
 		at :: Tensor mask_t = Converter :: to_mask(tetris).to(device);
 
 		timer.elapsed("Converter:");
+
+		model.eval();
+		torch :: NoGradGuard no_grad;
+
+		auto predict = [&] () {
+			auto output = model.forward({
+				board_t,
+				seq_t,
+				info_t,
+				mask_t,
+			}).toTuple();
+
+			at :: Tensor value_t = output -> elements()[0].toTensor();
+
+			return value_t[0].item<float>();
+		};
+
+		// warm up
+		for (int i = 0; i < 5; i ++) predict();
+
+		timer.reset();
+
+		for (int i = 0; i < 10; i ++) {
+			std :: cout << predict() << " ";
+		}
+		std :: cout << std :: endl;
+
+		timer.elapsed("Model Forward:");
+
+	}
+
+	if (mode == "speed_batch") {
+		Timer timer;
+
+		auto model = ModelLoader :: load(model_path, true);
+
+		timer.elapsed("Load Model:");
+
+		int batch = 128;
+
+		std :: vector<Tetris> tetris (batch);
+
+		auto device = (* model.parameters().begin()).device();
+
+		std :: cout << device << std :: endl;
+
+		timer.reset();
+
+		at :: Tensor board_t = Converter :: to_board(tetris).to(device);
+		at :: Tensor seq_t = Converter :: to_seq(tetris).to(device);
+		at :: Tensor info_t = Converter :: to_info(tetris).to(device);
+		at :: Tensor mask_t = Converter :: to_mask(tetris).to(device);
+
+		timer.elapsed("Converter:");
+
+		model.eval();
+		torch :: NoGradGuard no_grad;
 
 		auto predict = [&] () {
 			auto output = model.forward({

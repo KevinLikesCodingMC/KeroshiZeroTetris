@@ -4,11 +4,24 @@
 
 #include "include/model_loader.h"
 
+#include <filesystem>
+
 namespace ModelLoader {
 	torch :: jit :: script :: Module load(
 		const std :: string & path,
 		bool cuda, bool output
 	) {
+		if (! std :: filesystem :: exists(path)) {
+			if (output) {
+				Message :: log(Message :: ERROR, true,
+					"[ModelLoader] ",
+					"model<", path, "> loading failed.");
+				Message :: log(Message :: ERROR, true,
+					"File Not Found.");
+			}
+			std :: exit(EXIT_FAILURE);
+		}
+
 		torch :: jit :: script :: Module module;
 		try {
 			module = torch :: jit :: load(path);
