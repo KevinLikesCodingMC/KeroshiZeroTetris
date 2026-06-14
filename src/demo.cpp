@@ -68,7 +68,7 @@ int main(int argc, char * argv []) {
 	tetris.r_seq = std :: make_shared<std :: string>();
 	tetris.refill();
 
-	std :: string keys = "";
+	std :: string keys;
 
 	while (! is_end(tetris)) {
 		MCTS<Tetris> mcts;
@@ -92,7 +92,7 @@ int main(int argc, char * argv []) {
 
 			Tetris g = mcts.playout_select();
 
-			auto [V, P_t] = predictor.predict(g);
+			auto [V, P] = predictor.predict(g);
 
 			float Q = get_ex_V(g) - fst;
 			if (is_end(g)) {
@@ -106,16 +106,8 @@ int main(int argc, char * argv []) {
 				mcts.playout_back(Q, {});
 			}
 			else {
-				int n = g.legal().size();
-
-				if (n > 128) {
-					mcts.playout_back(Q, std :: vector<float>(1.f / n));
-				}
-				else {
-					auto P = P_t;
-					P.resize(n);
-					mcts.playout_back(Q, P);
-				}
+				auto P_softmax = mcts.softmax(g, P);
+				mcts.playout_back(Q, P_softmax);
 			}
 		}
 

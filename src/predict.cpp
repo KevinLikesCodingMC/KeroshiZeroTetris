@@ -26,12 +26,12 @@ Predictor :: predict
 	auto board_t = Converter :: to_board(t);
 	auto seq_t = Converter :: to_seq(t);
 	auto info_t = Converter :: to_info(t);
-	auto pos_t = Converter :: to_pos(t);
+	auto mask_t = Converter :: to_mask(t);
 
 	board_t = board_t.to(device);
 	seq_t = seq_t.to(device);
 	info_t = info_t.to(device);
-	pos_t = pos_t.to(device);
+	mask_t = mask_t.to(device);
 
 	model.eval();
 	torch :: NoGradGuard no_grad;
@@ -40,7 +40,7 @@ Predictor :: predict
 		board_t,
 		seq_t,
 		info_t,
-		pos_t
+		mask_t
 	}).toTuple();
 
 	auto V_out = output -> elements()[0].toTensor();
@@ -53,8 +53,8 @@ Predictor :: predict
 	float V = V_acc[0][0];
 
 	auto P_acc = P_cpu.accessor<float, 2>();
-	std :: vector P(128, 0.f);
-	for (int i = 0; i < 128; i ++)
+	std :: vector P(1537, 0.f);
+	for (int i = 0; i < 1537; i ++)
 		P[i] = P_acc[0][i];
 
 	return {V, P};

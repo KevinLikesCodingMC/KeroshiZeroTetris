@@ -28,9 +28,9 @@ void send_key(char key) {
 	inputs[1].ki.dwFlags = KEYEVENTF_KEYUP;
 
 	SendInput(1, & inputs[0], sizeof(INPUT));
-	Sleep(20);
+	Sleep(5);
 	SendInput(1, & inputs[1], sizeof(INPUT));
-	Sleep(20);
+	Sleep(5);
 }
 
 int main() {

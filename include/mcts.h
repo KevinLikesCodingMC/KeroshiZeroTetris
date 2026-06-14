@@ -93,6 +93,7 @@ struct MCTS {
 				expand(pos -> ch[a], game, P);
 			}
 		}
+
 		for (int i = int(path.size()) - 1; i >= 0; i --) {
 			auto [pos, a] = path[i];
 			pos -> N[a] ++;
@@ -124,6 +125,34 @@ struct MCTS {
 		}
 
 		return P;
+	}
+
+	std :: vector<float> softmax(Game & g, std :: vector<float> P) {
+		if (g.is_leaf()) return {};
+
+		auto actions = g.legal();
+		int n = actions.size();
+		std :: vector P_softmax(n, 0.f);
+
+		float mx = - 1e9;
+		for (int i = 0; i < n; i ++) {
+			int u = actions[i];
+			mx = std :: max(mx, P[u]);
+		}
+
+		float sum = 0;
+		for (int i = 0; i < n; i ++) {
+			int u = actions[i];
+			float x = std :: exp(P[u] - mx);
+			P_softmax[i] = x;
+			sum += x;
+		}
+
+		for (int i = 0; i < n; i ++) {
+			P_softmax[i] /= sum;
+		}
+
+		return P_softmax;
 	}
 
 	void noise(float alpha = 0.3f, float epsilon = 0.25f) {
