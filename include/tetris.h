@@ -454,7 +454,7 @@ struct Tetris {
 		if (action == Action :: hold()) return "C";
 
 		std :: vector<bool> vis(1537);
-		std :: vector<std :: pair<int, char>> pre(1 << 11);
+		std :: vector<std :: pair<int, char>> pre(1537);
 		std :: queue<std :: tuple<int, int, int>> q;
 
 		auto [sx, sy] = get_spawn();
@@ -537,8 +537,7 @@ struct Tetris {
 			}
 		}
 
-		action --;
-		if (! vis[action]) return "";
+		if (! vis[action]) return " [Error!] ";
 
 		std :: string res;
 
