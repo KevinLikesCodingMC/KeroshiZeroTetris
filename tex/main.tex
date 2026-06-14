@@ -5,6 +5,9 @@
 \usepackage{graphicx}
 \usepackage{subcaption}
 
+\usepackage{graphbox}
+\usepackage{ragged2e}
+
 \title{KeroshiZeroTetris: \\ \Large Self-Learning Modern Tetris AI}
 
 \author{
@@ -51,7 +54,7 @@
 	In Modern Tetris, human players often try to perform higher Attack Per Minute (APM), 
 	but Tetris AI needs to perform higher Attack Per Piece (APP).
 	
-	To challenge the highest APP, we present KeroshiZeroTetris based on AlphaZero\cite{silver2018general}.
+	To achieve a higher APP, we present KeroshiZeroTetris based on AlphaZero\cite{silver2018general}.
 
 	However, directly applying the AlphaZero framework to Modern Tetris brings some difficulties:
 
@@ -63,6 +66,103 @@
 	\end{itemize}
 
 	To solve these issues, this paper details the implementation of KeroshiZeroTetris.
+
+	\section{Model}
+
+	A Tetris model requires the following inputs:
+
+	\begin{itemize}
+		\item The board.
+		\item The piece types of the current, hold and next queue.
+		\item The values including Combo and Back-to-Back (B2B).
+	\end{itemize}
+
+	\begin{minipage}[t]{0.4\textwidth}
+		\includegraphics[width = \textwidth, align = t]{img/4.jpg}
+		\captionof{figure}{The piece sequence encoder.}
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{0.55\textwidth}
+		\hyphenpenalty = 10000
+
+		\vspace{1em}
+
+		We call the piece types the piece sequence.
+		First we need to encode this sequence.
+
+		First, we put the piece sequence into a Piece Embedding layer.
+		Then we add the Position Embedding to it.
+		After that, we send it into the Transformer Encoder\cite{vaswani2017attention}.
+		To make the model converge faster, we bring the original piece sequence embedding to do a residual connection\cite{he2016deep}.
+		Now, the piece sequence processing is finished.
+
+		\vspace{1em}
+
+		Next, we need to add the game data.
+		We use a Linear layer on the game data first.
+		Second, we join it with the sequence features and put them through another Linear layer.
+		Finally, we join it with the processed game data from the first step.
+		Now, the piece sequence and the game data are combined into a feature called Meta Feature.
+
+	\end{minipage}
+
+	\begin{minipage}[t]{0.3\textwidth}
+		\includegraphics[width = \textwidth, align = t]{img/5.jpg}
+		\captionof{figure}{The board encoder.}
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{0.65\textwidth}
+		\hyphenpenalty = 10000
+
+		\vspace{2em}
+		After we process the piece sequence and game data, we need to mix them into the board.
+		To do this, we use the FiLM\cite{perez2018film},
+		and use the Meta feature as the condition.
+		In the CNN part for the board, we use residual connections\cite{he2016deep} and pre-activation\cite{he2016identity}.
+		Finally we use a Convolution layer and a Flatten layer.
+		Then we combine the output with the original Meta Feature to get the final State Feature.
+
+		Just like AlphaZero\cite{silver2018general},
+		we use some Linear layers to connect the State Feature to Value Head and Policy Head.
+
+		\vspace{1em}
+
+		These are the detailed parameters of our model.
+
+		\vspace{1em}
+
+		\begin{tabular}{ll}
+		\hline
+		\textbf{Component} & \textbf{Size / Number} \\
+		\hline
+
+		Board Input						& $30 \times 10$ \\
+		Piece Sequence Length			& $10$ \\
+		Game Values						& $10$ \\
+
+		\hline
+
+		Piece Embedding Dimension		& $16$ \\
+		Transformer Encoder Layers		& $1$ \\
+		Meta Feature Dimension			& $256$ \\
+
+		\hline
+
+		CNN Channels					& $64$ \\
+		Residual Blocks					& $6$ \\
+		Flattened Board Feature			& $1200$ \\
+
+		\hline
+
+		State Feature Dimension			& $1456$ \\
+		Value Head						& $1456 \rightarrow 256 \rightarrow 1$ \\
+		Policy Head						& $1456 \rightarrow 512 \rightarrow 1537$ \\
+
+		\hline
+	\end{tabular}
+
+	\end{minipage}
+
 
 	\bibliographystyle{unsrt} 
 	\bibliography{references}
