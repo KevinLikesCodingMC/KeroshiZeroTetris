@@ -6,22 +6,41 @@
 #include <iostream>
 
 int main() {
-	TetrisBuffer buffer("test/buffer");
+	TetrisBuffer buffer("test/buffer", 3, 10);
 
-	TetrisTrainData data {};
+	buffer.load_sort_idx();
 
-	data.len = 10;
-	data.P.resize(data.len);
-	data.u.resize(data.len);
+	for (int i = 0; i < 10; i ++) {
+		TetrisTrainData data {};
+		data.len = i + 5;
+		data.V = 100 - i;
+		data.P.resize(data.len);
+		data.u.resize(data.len);
+		data.u[0] = i;
 
-	data.u[0] = 114;
+		buffer.add_game({data});
+	}
 
-	buffer.add_game({data, data});
+	{
+		auto data = buffer.sample_recent();
+		std :: cout << data.len << ' ' << int(data.u[0]) << std :: endl;
+	}
 
-	data = buffer.sample();
+	std :: cout << std :: endl;
 
-	std :: cout << data.len << std :: endl;
-	std :: cout << int(data.u[0]) << std :: endl;
+	for (int i = 0; i < buffer.tot; i ++) {
+		auto data = buffer.sample_by_id(i);
+		std :: cout << data.len << ' ' << int(data.u[0]) << std :: endl;
+	}
+
+	std :: cout << std :: endl;
+
+	for (int i = 0; i < buffer.tot; i ++) {
+		auto data = buffer.sample_by_sort_id(i);
+		std :: cout << data.len << ' ' << int(data.u[0]) << std :: endl;
+	}
+
+	buffer.save_sort_idx();
 
 	return 0;
 }
