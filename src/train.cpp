@@ -68,14 +68,14 @@ float TrainContext :: train(const std :: vector<TetrisTrainData> & data) {
 	auto board_t = Converter :: to_board(data);
 	auto seq_t = Converter :: to_seq(data);
 	auto info_t = Converter :: to_info(data);
-	auto pos_t = Converter :: to_pos(data);
+	auto mask_t = Converter :: to_mask(data);
 	auto V = Converter :: to_V(data);
 	auto P = Converter :: to_P(data);
 
 	board_t = board_t.to(device);
 	seq_t = seq_t.to(device);
 	info_t = info_t.to(device);
-	pos_t = pos_t.to(device);
+	mask_t = mask_t.to(device);
 	V = V.to(device);
 	P = P.to(device);
 
@@ -86,7 +86,7 @@ float TrainContext :: train(const std :: vector<TetrisTrainData> & data) {
 		board_t,
 		seq_t,
 		info_t,
-		pos_t
+		mask_t
 	}).toTuple();
 
 	auto V_out = output -> elements()[0].toTensor();
@@ -110,12 +110,12 @@ TrainContext :: predict_batch
 	auto board_t = Converter :: to_board(t);
 	auto seq_t = Converter :: to_seq(t);
 	auto info_t = Converter :: to_info(t);
-	auto pos_t = Converter :: to_pos(t);
+	auto mask_t = Converter :: to_mask(t);
 
 	board_t = board_t.to(device);
 	seq_t = seq_t.to(device);
 	info_t = info_t.to(device);
-	pos_t = pos_t.to(device);
+	mask_t = mask_t.to(device);
 
 	model.eval();
 	torch :: NoGradGuard no_grad;
@@ -124,7 +124,7 @@ TrainContext :: predict_batch
 		board_t,
 		seq_t,
 		info_t,
-		pos_t
+		mask_t
 	}).toTuple();
 
 	auto V_out = output -> elements()[0].toTensor();
@@ -133,10 +133,10 @@ TrainContext :: predict_batch
 	auto V_cpu = V_out.to(torch :: kCPU).contiguous();
 	auto P_cpu = P_out.to(torch :: kCPU).contiguous();
 
-	int batch = t.size();
+	int batch = static_cast<int>(t.size());
 
 	std :: vector<float> V(batch);
-	std :: vector<std :: vector<float>> P(batch);
+	std :: vector P(batch, std :: vector(1537, 0.f));
 
 	auto V_acc = V_cpu.accessor<float, 2>();
 	for (int I = 0; I < batch; I ++) {
@@ -145,8 +145,7 @@ TrainContext :: predict_batch
 
 	auto P_acc = P_cpu.accessor<float, 2>();
 	for (int I = 0; I < batch; I ++) {
-		P[I].resize(128);
-		for (int i = 0; i < 128; i ++)
+		for (int i = 0; i < 1537; i ++)
 			P[I][i] = P_acc[I][i];
 	}
 
