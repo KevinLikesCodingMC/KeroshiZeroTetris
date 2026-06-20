@@ -16,6 +16,7 @@ struct TetrisTrainData {
 	int len;
 	std :: vector<uint16_t> u;
 	std :: vector<float> P;
+	float PW = 1; // Policy Loss Weight
 };
 
 #endif //KEROSHIZEROTETRIS_RECORD_H
