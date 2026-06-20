@@ -20,7 +20,8 @@ namespace TetrisRender {
 			screen[28][x] = '#';
 		}
 
-		if (tetris.last_placement.piece != Piece :: EMPTY) {
+		if (tetris.last_placement.piece != Piece :: EMPTY
+			&& tetris.last_placement.clear == 0) {
 			int piece = static_cast<int>(tetris.last_placement.piece);
 			int x = tetris.last_placement.x;
 			int y = tetris.last_placement.y;
