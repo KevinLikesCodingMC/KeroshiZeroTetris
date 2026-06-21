@@ -361,3 +361,18 @@ TetrisTrainData TetrisBuffer :: sample_recent() {
 	return data;
 }
 
+TetrisTrainData TetrisBuffer :: sample_high_V() {
+	if (tot == 0) {
+		Message :: log(Message :: ERROR, true,
+			"Buffer is empty."
+		);
+		std :: exit(EXIT_FAILURE);
+	}
+
+	int l = std :: max(0, tot - w);
+	int u = linear_distribution(l, tot - 1);
+
+	TetrisTrainData data = sample_by_sort_id(u);
+
+	return data;
+}

@@ -55,6 +55,8 @@ struct TetrisBuffer {
 	void add_game(const std :: vector<TetrisTrainData> & data);
 
 	TetrisTrainData sample_recent();
+
+	TetrisTrainData sample_high_V();
 };
 
 #endif //KEROSHIZEROTETRIS_BUFFER_H
