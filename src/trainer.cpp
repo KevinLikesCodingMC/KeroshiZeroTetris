@@ -131,8 +131,8 @@ int main(int argc, char * argv []) {
 	std :: vector<Tetris> tetris(batch);
 	std :: vector<std :: vector<TetrisTrainData>> train_data(batch);
 
-	std :: string loss_file = "loss_" + std :: to_string(std :: time(nullptr)) + ".log";
-	std :: ofstream loss_ofs(loss_file);
+	std :: string log_file = "log_" + std :: to_string(std :: time(nullptr)) + ".log";
+	std :: ofstream log_ofs(log_file);
 
 	int games = 0;
 	while (games < target) {
@@ -220,13 +220,15 @@ int main(int argc, char * argv []) {
 						" | Attack: ", tetris[I].attack
 					);
 
-					loss_ofs << games << ' ' << loss << std :: endl;
+					log_ofs << games << ' ' << tetris[I].attack << ' ' << loss << std :: endl;
 				}
 				else {
 					Message :: log(Message :: INFO, true,
 						"Game: ", games,
 						" | Attack: ", tetris[I].attack
 					);
+
+					log_ofs << games << ' ' << tetris[I].attack << ' ' << 0 << std :: endl;
 				}
 
 				tetris[I] = Tetris();
