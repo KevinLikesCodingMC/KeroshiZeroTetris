@@ -13,3 +13,4 @@ tex/main_pre*
 buffer/
 
 *.pt
+*.opt
