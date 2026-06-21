@@ -38,14 +38,13 @@ float get_ex_V(const Tetris & t) {
 	return (20 - top) * 0.7f;
 }
 
-TetrisTrainData random_mask(TetrisTrainData data) {
+void random_mask(TetrisTrainData & data) {
 	static std :: mt19937 rnd(std :: random_device {}());
 	std :: uniform_int_distribution dist(0, 6);
 
 	int x = dist(rnd);
 	if (x == 0) data.seq[0] = 0, x ++;
 	for (int i = x + 1; i <= 6; i ++) data.seq[i] = 0;
-	return data;
 }
 
 // TUNING:
@@ -67,6 +66,7 @@ std :: vector<TetrisTrainData> get_samples(int sample, TetrisBuffer & buffer) {
 	}
 
 	for (auto & data : samples) {
+		random_mask(data);
 		float V = data.V;
 		data.PW = std :: powf((V + 1) / (V_max + 1), 2);
 	}
