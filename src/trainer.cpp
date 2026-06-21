@@ -36,6 +36,16 @@ float get_ex_V(const Tetris & t) {
 	return (20 - top) * 0.7f;
 }
 
+TetrisTrainData random_mask(TetrisTrainData data) {
+	static std :: mt19937 rnd(std :: random_device {}());
+	std :: uniform_int_distribution dist(0, 6);
+
+	int x = dist(rnd);
+	if (x == 0) data.seq[0] = 0, x ++;
+	for (int i = x + 1; i <= 6; i ++) data.seq[i] = 0;
+	return data;
+}
+
 int main(int argc, char * argv []) {
 	if (argc < 4) {
 		std :: cout << "Usage: " << argv[0]

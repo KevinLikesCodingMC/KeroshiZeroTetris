@@ -345,7 +345,7 @@ int linear_distribution(int l, int r) {
 	return std :: max(x, y);
 }
 
-TetrisTrainData TetrisBuffer :: sample_recent(bool random_mask) {
+TetrisTrainData TetrisBuffer :: sample_recent() {
 	if (tot == 0) {
 		Message :: log(Message :: ERROR, true,
 			"Buffer is empty."
@@ -357,15 +357,6 @@ TetrisTrainData TetrisBuffer :: sample_recent(bool random_mask) {
 	int u = linear_distribution(l, tot - 1);
 
 	TetrisTrainData data = sample_by_id(u);
-
-	if (random_mask) {
-		static std :: mt19937 rnd(std :: random_device {}());
-		std :: uniform_int_distribution dist(0, 6);
-
-		int x = dist(rnd);
-		if (x == 0) data.seq[0] = 0, x ++;
-		for (int i = x + 1; i <= 6; i ++) data.seq[i] = 0;
-	}
 
 	return data;
 }

@@ -54,7 +54,7 @@ struct TetrisBuffer {
 	void add_game(const TetrisTrainData & data);
 	void add_game(const std :: vector<TetrisTrainData> & data);
 
-	TetrisTrainData sample_recent(bool random_mask = true);
+	TetrisTrainData sample_recent();
 };
 
 #endif //KEROSHIZEROTETRIS_BUFFER_H
