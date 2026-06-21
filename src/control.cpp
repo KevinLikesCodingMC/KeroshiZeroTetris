@@ -14,7 +14,7 @@ void send_key(char key) {
 	if (key == 'Z') code = 'Z', push = 10;
 	if (key == 'u') code = VK_UP, push = 10;
 
-	if (key == 'D') code = VK_DOWN, push = 120;
+	if (key == 'D') code = VK_DOWN, push = 10;
 	if (key == 'L') code = VK_LEFT, push = 120;
 	if (key == 'R') code = VK_RIGHT, push = 120;
 	if (key == 'l') code = VK_LEFT, push = 10;
