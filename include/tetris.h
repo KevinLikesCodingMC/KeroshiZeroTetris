@@ -360,6 +360,20 @@ struct Tetris {
 		return {5, 21};
 	}
 
+	std :: pair<int, int> das_l(int x, int y, int r) {
+		while (is_legal(x - 1, y, r)) x --;
+		return {x, y};
+	}
+	std :: pair<int, int> das_r(int x, int y, int r) {
+		while (is_legal(x + 1, y, r)) x ++;
+		return {x, y};
+	}
+	std :: pair<int, int> das_d(int x, int y, int r) {
+		while (is_legal(x, y - 1, r)) y --;
+		return {x, y};
+	}
+
+
 	std :: vector<int> legal() {
 		std :: vector<int> res;
 		if (game_over) return res;
@@ -372,9 +386,6 @@ struct Tetris {
 		int st = Action :: place(sx, sy, 0);
 		vis[st] = true;
 		q.emplace(sx, sy, 0);
-
-		constexpr int dx[] = {0, - 1, 1};
-		constexpr int dy[] = {- 1, 0, 0};
 
 		int piece = static_cast<int>(cur);
 
@@ -390,10 +401,18 @@ struct Tetris {
 				res.push_back(Action :: place(x, y, r));
 			}
 
-			for (int d = 0; d < 3; d ++) {
-				int X = x + dx[d];
-				int Y = y + dy[d];
-				if (! is_legal(X, Y, r)) continue;
+			for (int dx : {- 1, 1}) {
+				int X = x + dx;
+				if (! is_legal(X, y, r)) continue;
+				int v = Action :: place(X, y, r);
+				if (! vis[v]) {
+					vis[v] = true;
+					q.emplace(X, y, r);
+				}
+			}
+
+			{
+				auto [X, Y] = das_d(x, y, r);
 				int v = Action :: place(X, Y, r);
 				if (! vis[v]) {
 					vis[v] = true;
@@ -462,9 +481,6 @@ struct Tetris {
 		vis[st] = true;
 		q.emplace(sx, sy, 0);
 
-		constexpr int dx[] = {0, - 1, 1};
-		constexpr int dy[] = {- 1, 0, 0};
-
 		int piece = static_cast<int>(cur);
 
 		auto kicks_cw = SRSP :: kicks_cw[piece];
@@ -477,14 +493,43 @@ struct Tetris {
 
 			int u = Action :: place(x, y, r);
 
-			for (int d = 0; d < 3; d ++) {
-				int X = x + dx[d];
-				int Y = y + dy[d];
-				if (! is_legal(X, Y, r)) continue;
+			for (int dx : {- 1, 1}) {
+				int X = x + dx;
+				if (! is_legal(X, y, r)) continue;
+				int v = Action :: place(X, y, r);
+				if (! vis[v]) {
+					vis[v] = true;
+					pre[v] = {u, dx == - 1 ? 'l' : 'r'};
+					q.emplace(X, y, r);
+				}
+			}
+
+			{
+				auto [X, Y] = das_d(x, y, r);
 				int v = Action :: place(X, Y, r);
 				if (! vis[v]) {
 					vis[v] = true;
-					pre[v] = {u, "dlr"[d]};
+					pre[v] = {u, 'D'};
+					q.emplace(X, Y, r);
+				}
+			}
+
+			{
+				auto [X, Y] = das_l(x, y, r);
+				int v = Action :: place(X, Y, r);
+				if (! vis[v]) {
+					vis[v] = true;
+					pre[v] = {u, 'L'};
+					q.emplace(X, Y, r);
+				}
+			}
+
+			{
+				auto [X, Y] = das_r(x, y, r);
+				int v = Action :: place(X, Y, r);
+				if (! vis[v]) {
+					vis[v] = true;
+					pre[v] = {u, 'R'};
 					q.emplace(X, Y, r);
 				}
 			}
