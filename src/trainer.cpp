@@ -7,6 +7,7 @@
 #include "include/converter.h"
 #include "include/mcts.h"
 #include "include/tetris.h"
+#include "include/timer.h"
 
 /*
 trainer
@@ -27,6 +28,7 @@ float get_V(const Tetris & t) {
 	return t.attack;
 }
 
+// TUNING:
 float get_ex_V(const Tetris & t) {
 	int top = 30;
 	for (int y = 29; y >= 0; y --) {
@@ -45,6 +47,33 @@ TetrisTrainData random_mask(TetrisTrainData data) {
 	for (int i = x + 1; i <= 6; i ++) data.seq[i] = 0;
 	return data;
 }
+
+// TUNING:
+std :: vector<TetrisTrainData> get_samples(int sample, TetrisBuffer & buffer) {
+	std :: vector<TetrisTrainData> samples;
+	if (buffer.tot == 0) return samples;
+
+	auto V_max_data = buffer.sample_by_sort_id(buffer.tot - 1);
+	float V_max = V_max_data.V;
+
+	for (int _ = 0; _ < sample; _ ++) {
+		auto data = buffer.sample_recent();
+		samples.push_back(data);
+	}
+
+	for (int _ = 0; _ < sample; _ ++) {
+		auto data = buffer.sample_high_V();
+		samples.push_back(data);
+	}
+
+	for (auto & data : samples) {
+		float V = data.V;
+		data.PW = std :: powf((V + 1) / (V_max + 1), 2);
+	}
+
+	return samples;
+}
+
 
 int main(int argc, char * argv []) {
 	if (argc < 4) {
@@ -97,15 +126,22 @@ int main(int argc, char * argv []) {
 	);
 
 	TetrisBuffer buffer(data_path, 10000, 100000);
+	buffer.load_sort_idx();
 
 	std :: vector<Tetris> tetris(batch);
 	std :: vector<std :: vector<TetrisTrainData>> train_data(batch);
+
+	std :: string loss_file = "loss_" + std :: to_string(std :: time(nullptr)) + ".log";
+	std :: ofstream loss_ofs(loss_file);
 
 	int games = 0;
 	while (games < target) {
 
 		std :: vector<MCTS<Tetris>> mcts(batch);
 		std :: vector<float> fst(batch);
+
+		Timer timer;
+
 		{
 			std :: vector<Tetris> g(batch);
 			for (int I = 0; I < batch; I ++) {
@@ -146,19 +182,14 @@ int main(int argc, char * argv []) {
 					mcts[I].playout_back(Q, {});
 				}
 				else {
-					int n = g[I].legal().size();
-
-					if (n > 128) {
-						mcts[I].playout_back(Q, std :: vector<float>(1.f / n));
-					}
-					else {
-						auto P = P_t[I];
-						P.resize(n);
-						mcts[I].playout_back(Q, P);
-					}
+					auto P = P_t[I];
+					auto P_softmax = mcts[I].softmax(g[I], P);
+					mcts[I].playout_back(Q, P_softmax);
 				}
 			}
 		}
+
+		timer.elapsed("MCTS search step");
 
 		for (int I = 0; I < batch; I ++) {
 			int id = mcts[I].get_best();
@@ -180,9 +211,7 @@ int main(int argc, char * argv []) {
 
 				if (buffer.tot >= 500) {
 					std :: vector<TetrisTrainData> samples;
-					for (int _ = 0; _ < sample; _ ++) {
-						samples.push_back(buffer.sample());
-					}
+					samples = get_samples(sample, buffer);
 
 					float loss = trainer.train(samples);
 					Message :: log(Message :: INFO, true,
@@ -190,6 +219,8 @@ int main(int argc, char * argv []) {
 						" | Loss: ", loss,
 						" | Attack: ", tetris[I].attack
 					);
+
+					loss_ofs << games << ' ' << loss << std :: endl;
 				}
 				else {
 					Message :: log(Message :: INFO, true,
@@ -207,6 +238,7 @@ int main(int argc, char * argv []) {
 	}
 
 	trainer.save();
+	buffer.save_sort_idx();
 
 	return 0;
 }
