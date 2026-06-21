@@ -205,6 +205,19 @@ namespace Converter {
 		return tensor;
 	}
 
+	at :: Tensor to_PW(const std :: vector<TetrisTrainData> & data) {
+		int batch = static_cast<int>(data.size());
+
+		auto tensor = at :: zeros({batch}, at :: kFloat);
+		auto acc = tensor.accessor<float, 1>();
+
+		for (int I = 0; I < batch; I ++) {
+			acc[I] = data[I].PW;
+		}
+
+		return tensor;
+	}
+
 	TetrisTrainData to_train_data(Tetris & t, const std :: vector<float> & P) {
 		TetrisTrainData data {};
 

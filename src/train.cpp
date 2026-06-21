@@ -71,6 +71,7 @@ float TrainContext :: train(const std :: vector<TetrisTrainData> & data) {
 	auto mask_t = Converter :: to_mask(data);
 	auto V = Converter :: to_V(data);
 	auto P = Converter :: to_P(data);
+	auto PW = Converter :: to_PW(data);
 
 	board_t = board_t.to(device);
 	seq_t = seq_t.to(device);
@@ -78,6 +79,7 @@ float TrainContext :: train(const std :: vector<TetrisTrainData> & data) {
 	mask_t = mask_t.to(device);
 	V = V.to(device);
 	P = P.to(device);
+	PW = PW.to(device);
 
 	model.train();
 	optimizer -> zero_grad();
@@ -95,7 +97,10 @@ float TrainContext :: train(const std :: vector<TetrisTrainData> & data) {
 	auto V_loss = torch :: mse_loss(V_out, V);
 
 	auto P_log = torch :: log_softmax(P_out, 1);
-	auto P_loss = - (P * P_log).sum(1).mean();
+	auto P_losses = - (P * P_log).sum(1);
+	auto P_loss = (P_losses * PW).mean();
+
+	P_loss = P_loss.clamp_min(1e-6f);
 
 	auto loss = V_loss + P_loss;
 	loss.backward();
