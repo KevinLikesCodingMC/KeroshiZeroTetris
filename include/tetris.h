@@ -594,6 +594,8 @@ struct Tetris {
 
 		std :: reverse(res.begin(), res.end());
 
+		while (! res.empty() && res.back() == 'D') res.pop_back();
+
 		res += "s";
 
 		return res;
