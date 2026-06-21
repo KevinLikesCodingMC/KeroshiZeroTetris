@@ -7,30 +7,34 @@
 
 void send_key(char key) {
 	WORD code {};
-	if (key == 'A') code = 'A';
-	if (key == 'C') code = 'C';
-	if (key == 'Z') code = 'Z';
-	if (key == 'd') code = VK_DOWN;
-	if (key == 'u') code = VK_UP;
-	if (key == 'l') code = VK_LEFT;
-	if (key == 'r') code = VK_RIGHT;
-	if (key == 's') code = VK_SPACE;
+	int push = 0;
+
+	if (key == 'A') code = 'A', push = 10;
+	if (key == 'C') code = 'C', push = 10;
+	if (key == 'Z') code = 'Z', push = 10;
+	if (key == 'u') code = VK_UP, push = 10;
+
+	if (key == 'D') code = VK_DOWN, push = 120;
+	if (key == 'L') code = VK_LEFT, push = 120;
+	if (key == 'R') code = VK_RIGHT, push = 120;
+	if (key == 'l') code = VK_LEFT, push = 10;
+	if (key == 'r') code = VK_RIGHT, push = 10;
+
+	if (key == 's') code = VK_SPACE, push = 10;
 
 	INPUT inputs[2] = {};
 
 	inputs[0].type = INPUT_KEYBOARD;
 	inputs[0].ki.wVk = code;
-	inputs[0].ki.wScan = MapVirtualKeyA(code, MAPVK_VK_TO_VSC);
 
 	inputs[1].type = INPUT_KEYBOARD;
 	inputs[1].ki.wVk = code;
-	inputs[1].ki.wScan = inputs[0].ki.wScan;
 	inputs[1].ki.dwFlags = KEYEVENTF_KEYUP;
 
 	SendInput(1, & inputs[0], sizeof(INPUT));
-	Sleep(5);
+	Sleep(push);
 	SendInput(1, & inputs[1], sizeof(INPUT));
-	Sleep(5);
+	Sleep(10);
 }
 
 int main() {
