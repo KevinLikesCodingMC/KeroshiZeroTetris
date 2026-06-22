@@ -2,6 +2,8 @@
 // Created by Administrator on 2026/6/9.
 //
 
+#include "include/control.h"
+
 #include <iostream>
 #include "windows.h"
 
@@ -22,6 +24,8 @@ void send_key(char key) {
 
 	if (key == 's') code = VK_SPACE, push = 10;
 
+	if (key == 'c') code = 'R', push = 1000;
+
 	INPUT inputs[2] = {};
 
 	inputs[0].type = INPUT_KEYBOARD;
@@ -37,17 +41,6 @@ void send_key(char key) {
 	Sleep(10);
 }
 
-int main() {
-	std :: string keys;
-
-	std :: cout << "Input Keys:";
-	std :: cin >> keys;
-
-	std :: cout << "Focus on window in 3 seconds" << std :: endl;
-
-	Sleep(3000);
-
+void Controller :: control(std :: string keys) {
 	for (char key : keys) send_key(key);
-
-	return 0;
 }
