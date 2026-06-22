@@ -103,6 +103,12 @@ add_executable(
 		api/control.cpp
 )
 
+add_executable(
+		tetrio_f
+		api/tetrio_f.cpp
+		api/control.cpp
+)
+
 install(
 		TARGETS
 		test_mino
@@ -114,6 +120,9 @@ install(
 		test_mcts_tetris
 		test_buffer
 		trainer
+		demo
+		control
+		tetrio_f
 		DESTINATION
 		bin
 )
