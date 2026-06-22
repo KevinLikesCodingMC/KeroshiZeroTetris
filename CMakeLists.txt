@@ -100,7 +100,7 @@ target_link_libraries(demo "${TORCH_LIBRARIES}")
 
 add_executable(
 		control
-		src/control.cpp
+		api/control.cpp
 )
 
 install(
