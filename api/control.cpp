@@ -24,7 +24,7 @@ void send_key(char key) {
 
 	if (key == 's') code = VK_SPACE, push = 10;
 
-	if (key == 'c') code = 'R', push = 1000;
+	if (key == 'c') code = 'R', push = 600;
 
 	INPUT inputs[2] = {};
 

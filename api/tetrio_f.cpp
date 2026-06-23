@@ -27,7 +27,7 @@ int main() {
 		ofs << T << ' ' << seq << std :: endl;
 		ofs.flush();
 
-		Sleep(1000);
+		Sleep(200);
 
 		Controller :: control(keys);
 	}
