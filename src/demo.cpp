@@ -23,12 +23,7 @@ float get_V(const Tetris & t) {
 }
 
 float get_ex_V(const Tetris & t) {
-	int top = 30;
-	for (int y = 29; y >= 0; y --) {
-		if (t.b[y]) break;
-		top = y;
-	}
-	return (20 - top) * 0.7f;
+	return 0;
 }
 
 int main(int argc, char * argv []) {
@@ -70,7 +65,15 @@ int main(int argc, char * argv []) {
 
 	std :: string keys;
 
-	while (! is_end(tetris)) {
+	int step = 100;
+	while (step && ! is_end(tetris)) {
+		step --;
+
+		if (tetris.pieces == 7) {
+			tetris.pieces = 0;
+			tetris.attack = 0;
+		}
+
 		MCTS<Tetris> mcts;
 		float fst;
 
