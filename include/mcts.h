@@ -176,4 +176,167 @@ struct MCTS {
 	}
 };
 
+template < GameState Game>
+struct MCTSV {
+
+	float QR, C, VC;
+	struct Node {
+		int n = 0;
+		std :: vector<int> a;
+		std :: vector<std :: unique_ptr<Node>> ch;
+		int Sum_N = 0, Sum_V = 0;
+		std :: vector<int> N;
+		std :: vector<float> P, Q;
+		std :: vector<int> NV;
+
+
+		/*
+			Score = (Q * N - V * VC) / (N + V) / MaxQ + C * P * sqrt(sum N + sum V) / (N + V + 1)
+		*/
+		int select(float qr, float c, float vc) {
+			int id = 0;
+			float res = - 1e18;
+			float val = c * std :: sqrt(Sum_N + Sum_V);
+			for (int i = 0; i < n; i ++) {
+				float score = 0;
+				if (N[i] + NV[i] == 0) {
+					score = val * P[i];
+				}
+				else {
+					score = (Q[i] * N[i] - NV[i] * vc) / (N[i] + NV[i]) / qr + val * P[i] / (N[i] + NV[i] + 1.f);
+				}
+				if (score > res) res = score, id = i;
+			}
+			return id;
+		}
+	};
+
+	std :: unique_ptr<Node> root;
+	Game root_game;
+	std :: vector<Game> games;
+
+	std :: vector<std :: vector<std :: pair<Node *, int>>> paths;
+
+	MCTSV(float QR = 1.f, float C = 5.f, float VC = 1.f)
+		: QR(QR) , C(C) , VC(VC) {
+		root = nullptr;
+	}
+
+	std :: vector<Game> playout_select(int batch) {
+		games.resize(batch);
+		paths.resize(batch);
+		for (int I = 0; I < batch; I ++) {
+			auto & game = games[I];
+			game = root_game;
+			paths[I].clear();
+			Node * cur = root.get();
+			while (! game.is_leaf() && cur != nullptr) {
+				int u = cur -> select(QR, C, VC);
+				paths[I].emplace_back(cur, u);
+				game.step(cur -> a[u]);
+				cur -> NV[u] ++;
+				cur -> Sum_V ++;
+				cur = cur -> ch[u].get();
+			}
+		}
+		return games;
+	}
+
+	void expand(
+		std :: unique_ptr<Node> & node,
+		Game & g,
+		std :: vector<float> P
+	) {
+		node = std :: make_unique<Node>();
+		node -> a = g.legal();
+		int n = node -> a.size();
+		node -> n = n;
+		node -> Sum_N = 0;
+		node -> Sum_V = 0;
+		node -> ch = std :: vector<std :: unique_ptr<Node>>(n);
+		node -> P = P;
+		node -> Q = std :: vector(n, 0.f);
+		node -> N = std :: vector(n, 0);
+		node -> NV = std :: vector(n, 0);
+	}
+
+	void playout_back(std :: vector<float> V, std :: vector<std :: vector<float>> P) {
+		for (int I = 0; I < games.size(); I ++) {
+			auto & game = games[I];
+			auto & path = paths[I];
+			if (! game.is_leaf()) {
+				if (path.empty()) {
+					expand(root, game, P[I]);
+				}
+				else {
+					auto [pos, a] = path.back();
+					expand(pos -> ch[a], game, P[I]);
+				}
+			}
+
+			for (int i = int(path.size()) - 1; i >= 0; i --) {
+				auto [pos, a] = path[i];
+				pos -> N[a] ++;
+				pos -> Q[a] += (V[I] - pos -> Q[a]) / pos -> N[a];
+				pos -> Sum_N ++;
+				pos -> Sum_V --;
+				pos -> NV[a] --;
+			}
+		}
+	}
+
+	int get_best() {
+		if (root_game.is_over()) return - 1;
+		int id = 0, res = 0;
+		for (int i = 0; i < root -> n; i ++) {
+			if (root -> N[i] > res) {
+				res = root -> N[i];
+				id = i;
+			}
+		}
+		return id;
+	}
+
+	std :: vector<float> get_P() {
+		if (root == nullptr) return {};
+
+		int n = root -> n;
+		std :: vector P(n, 0.f);
+
+		for (int i = 0; i < n; i ++) {
+			P[i] = static_cast<float>(root -> N[i]) / root -> Sum_N;
+		}
+
+		return P;
+	}
+
+	std :: vector<float> softmax(Game & g, std :: vector<float> P) {
+		if (g.is_leaf()) return {};
+
+		auto actions = g.legal();
+		int n = actions.size();
+		std :: vector P_softmax(n, 0.f);
+
+		float mx = - 1e9;
+		for (int i = 0; i < n; i ++) {
+			int u = actions[i];
+			mx = std :: max(mx, P[u]);
+		}
+
+		float sum = 0;
+		for (int i = 0; i < n; i ++) {
+			int u = actions[i];
+			float x = std :: exp(P[u] - mx);
+			P_softmax[i] = x;
+			sum += x;
+		}
+
+		for (int i = 0; i < n; i ++) {
+			P_softmax[i] /= sum;
+		}
+
+		return P_softmax;
+	}
+};
+
 #endif //KEROSHIZEROTETRIS_MCTS_H

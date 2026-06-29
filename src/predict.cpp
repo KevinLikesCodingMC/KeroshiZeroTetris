@@ -59,3 +59,51 @@ Predictor :: predict
 
 	return {V, P};
 }
+
+std :: pair<std :: vector<float>, std :: vector<std :: vector<float>>>
+Predictor :: predict_batch
+(std :: vector<Tetris> & t) {
+	auto board_t = Converter :: to_board(t);
+	auto seq_t = Converter :: to_seq(t);
+	auto info_t = Converter :: to_info(t);
+	auto mask_t = Converter :: to_mask(t);
+
+	board_t = board_t.to(device);
+	seq_t = seq_t.to(device);
+	info_t = info_t.to(device);
+	mask_t = mask_t.to(device);
+
+	model.eval();
+	torch :: NoGradGuard no_grad;
+
+	auto output = model.forward({
+		board_t,
+		seq_t,
+		info_t,
+		mask_t
+	}).toTuple();
+
+	auto V_out = output -> elements()[0].toTensor();
+	auto P_out = torch :: softmax(output -> elements()[1].toTensor(), 1);
+
+	auto V_cpu = V_out.to(torch :: kCPU).contiguous();
+	auto P_cpu = P_out.to(torch :: kCPU).contiguous();
+
+	int batch = static_cast<int>(t.size());
+
+	std :: vector<float> V(batch);
+	std :: vector P(batch, std :: vector(1537, 0.f));
+
+	auto V_acc = V_cpu.accessor<float, 2>();
+	for (int I = 0; I < batch; I ++) {
+		V[I] = V_acc[I][0];
+	}
+
+	auto P_acc = P_cpu.accessor<float, 2>();
+	for (int I = 0; I < batch; I ++) {
+		for (int i = 0; i < 1537; i ++)
+			P[I][i] = P_acc[I][i];
+	}
+
+	return {V, P};
+}

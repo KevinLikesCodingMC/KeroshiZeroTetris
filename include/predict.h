@@ -20,6 +20,10 @@ struct Predictor {
 
 	std :: pair<float, std :: vector<float>>
 	predict(Tetris & t);
+
+	std :: pair<std :: vector<float>, std :: vector<std :: vector<float>>>
+	predict_batch
+	(std :: vector<Tetris> & t);
 };
 
 #endif //KEROSHIZEROTETRIS_PREDICT_H
