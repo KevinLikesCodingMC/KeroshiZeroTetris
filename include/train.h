@@ -23,6 +23,10 @@ struct TrainContext {
 
 	float train(const std :: vector<TetrisTrainData> & data);
 
+	std :: pair<float, std :: vector<float>>
+	predict
+	(Tetris & t);
+
 	std :: pair<std :: vector<float>, std :: vector<std :: vector<float>>>
 	predict_batch
 	(std :: vector<Tetris> & t);
