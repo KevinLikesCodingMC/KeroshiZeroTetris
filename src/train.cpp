@@ -63,7 +63,7 @@ TrainContext :: TrainContext(
 	model.eval();
 }
 
-float TrainContext :: train(const std :: vector<TetrisTrainData> & data) {
+std :: pair<float, float> TrainContext :: train(const std :: vector<TetrisTrainData> & data) {
 
 	auto board_t = Converter :: to_board(data);
 	auto seq_t = Converter :: to_seq(data);
@@ -106,7 +106,7 @@ float TrainContext :: train(const std :: vector<TetrisTrainData> & data) {
 	loss.backward();
 	optimizer -> step();
 
-	return loss.item<float>();
+	return { V_loss.item<float>(), P_loss.item<float>() };
 }
 
 std :: pair<float, std :: vector<float>>

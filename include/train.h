@@ -21,7 +21,8 @@ struct TrainContext {
 		bool output = true
 	);
 
-	float train(const std :: vector<TetrisTrainData> & data);
+	std :: pair<float, float>
+	train(const std :: vector<TetrisTrainData> & data);
 
 	std :: pair<float, std :: vector<float>>
 	predict
