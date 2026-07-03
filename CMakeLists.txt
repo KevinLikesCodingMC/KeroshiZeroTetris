@@ -109,6 +109,24 @@ add_executable(
 		api/control.cpp
 )
 
+add_executable(
+		test_model_attack_gen
+		test/model/attack/gen.cpp
+		src/buffer.cpp
+		src/converter.cpp
+)
+target_link_libraries(test_model_attack_gen "${TORCH_LIBRARIES}")
+
+add_executable(
+		test_model_attack_loss
+		test/model/attack/loss.cpp
+		src/buffer.cpp
+		src/train.cpp
+		src/converter.cpp
+		src/model_loader.cpp
+)
+target_link_libraries(test_model_attack_loss "${TORCH_LIBRARIES}")
+
 install(
 		TARGETS
 		test_mino
