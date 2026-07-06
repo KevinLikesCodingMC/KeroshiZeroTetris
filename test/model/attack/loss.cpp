@@ -8,16 +8,16 @@
 int main(int argc, char * argv []) {
 
 	std :: string buffer_path = "test/model/attack/buffer";
-	TetrisBuffer buffer(buffer_path, 10000, 100000);
+	TetrisBuffer buffer(buffer_path, 40000, 100000);
 
 	std :: string file_name = std :: to_string(std :: time(nullptr)) + ".log";
 	if (argc >= 2) file_name = std :: string(argv[1]);
 
-	TrainContext trainer("model/default.pt", "empty");
+	TrainContext trainer("model/default.pt", "empty", true);
 
 	std :: ofstream ofs(file_name);
 
-	int epoch = 100;
+	int epoch = 1000;
 	for (int i = 0; i < epoch; i ++) {
 		std :: vector<TetrisTrainData> sample;
 		for (int _ = 0; _ < 512; _ ++) {

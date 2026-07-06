@@ -114,6 +114,7 @@ add_executable(
 		test/model/attack/gen.cpp
 		src/buffer.cpp
 		src/converter.cpp
+		src/combo.cpp
 )
 target_link_libraries(test_model_attack_gen "${TORCH_LIBRARIES}")
 
