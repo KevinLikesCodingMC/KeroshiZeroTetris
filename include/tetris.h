@@ -64,6 +64,7 @@ struct Tetris {
 	bool game_over, can_hold;
 
 	int pieces; float attack;
+	int rest_pieces;
 
 	Placement last_placement;
 
@@ -97,6 +98,7 @@ struct Tetris {
 		can_hold = true;
 		pieces = 0;
 		attack = 0;
+		rest_pieces = 0;
 
 		last_placement = {
 			Piece :: EMPTY, 0, 0, 0,
@@ -325,6 +327,8 @@ struct Tetris {
 		}
 
 		roll();
+
+		rest_pieces --;
 	}
 
 	void step(int action) {
@@ -505,16 +509,6 @@ struct Tetris {
 			}
 
 			{
-				auto [X, Y] = das_d(x, y, r);
-				int v = Action :: place(X, Y, r);
-				if (! vis[v]) {
-					vis[v] = true;
-					pre[v] = {u, 'D'};
-					q.emplace(X, Y, r);
-				}
-			}
-
-			{
 				auto [X, Y] = das_l(x, y, r);
 				int v = Action :: place(X, Y, r);
 				if (! vis[v]) {
@@ -578,6 +572,16 @@ struct Tetris {
 						q.emplace(X, Y, R);
 					}
 					break;
+				}
+			}
+
+			{
+				auto [X, Y] = das_d(x, y, r);
+				int v = Action :: place(X, Y, r);
+				if (! vis[v]) {
+					vis[v] = true;
+					pre[v] = {u, 'D'};
+					q.emplace(X, Y, r);
 				}
 			}
 		}

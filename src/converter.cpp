@@ -40,8 +40,7 @@ namespace Converter {
 		acc[0][0] = t.can_hold ? 1.f : 0.f;
 		acc[0][1] = static_cast<float>(t.combo) / 10.f;
 		acc[0][2] = static_cast<float>(std :: log(t.b2b + 1));
-		acc[0][3] = static_cast<float>(t.pieces);
-		acc[0][4] = t.attack;
+		acc[0][3] = static_cast<float>(t.rest_pieces);
 		return tensor;
 	}
 
@@ -103,8 +102,7 @@ namespace Converter {
 			acc[I][0] = t[I].can_hold ? 1.f : 0.f;
 			acc[I][1] = static_cast<float>(t[I].combo) / 10.f;
 			acc[I][2] = static_cast<float>(std :: log(t[I].b2b + 1));
-			acc[I][3] = static_cast<float>(t[I].pieces);
-			acc[I][4] = t[I].attack;
+			acc[I][3] = static_cast<float>(t[I].rest_pieces);
 		}
 		return tensor;
 	}
