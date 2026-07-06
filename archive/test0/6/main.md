@@ -2,7 +2,7 @@
 
 from `5.pt` , use `buffer/1` too.
 
-height reward weight same a's
+height reward weight same as `5.pt`
 
 the Policy Loss changed to:
 
@@ -15,7 +15,3 @@ train command:
 ```shell
 bin/trainer model/5.pt model/5.opt buffer/1 3000 500 128 256
 ```
-
-a sample game:
-
-
