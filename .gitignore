@@ -15,3 +15,5 @@ buffer/
 *.pt
 *.opt
 *.mkv
+
+test/model/attack/*.log

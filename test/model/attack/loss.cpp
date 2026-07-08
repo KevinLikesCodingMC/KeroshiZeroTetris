@@ -17,7 +17,7 @@ int main(int argc, char * argv []) {
 
 	std :: ofstream ofs(file_name);
 
-	int epoch = 1000;
+	int epoch = 10000;
 	for (int i = 0; i < epoch; i ++) {
 		std :: vector<TetrisTrainData> sample;
 		for (int _ = 0; _ < 512; _ ++) {
