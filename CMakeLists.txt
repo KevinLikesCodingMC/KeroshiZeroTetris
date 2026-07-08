@@ -85,6 +85,7 @@ add_executable(
 		src/train.cpp
 		src/converter.cpp
 		src/buffer.cpp
+		src/combo.cpp
 )
 target_link_libraries(trainer "${TORCH_LIBRARIES}")
 
@@ -127,6 +128,12 @@ add_executable(
 		src/model_loader.cpp
 )
 target_link_libraries(test_model_attack_loss "${TORCH_LIBRARIES}")
+
+add_executable(
+		test_tetris_seed
+		test/test_tetris_seed.cpp
+		src/combo.cpp
+)
 
 install(
 		TARGETS

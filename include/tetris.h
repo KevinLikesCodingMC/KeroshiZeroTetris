@@ -70,13 +70,25 @@ struct Tetris {
 
 	ComboFunc combo_func;
 
+	std :: mt19937 rnd;
+	int seed;
+
 	bool depleted;
 
 	bool record_seq;
 	std :: shared_ptr<std :: string> r_seq;
 
-	Tetris() {
+	Tetris(int seed = - 1)
+		: seed(seed) {
+
 		depleted = false;
+
+		if (seed == - 1) {
+			rnd = std :: mt19937(std :: random_device{}());
+		}
+		else {
+			rnd = std :: mt19937(seed);
+		}
 
 		record_seq = false;
 		r_seq = nullptr;
@@ -119,7 +131,6 @@ struct Tetris {
 	}
 
 	Piece get_next() {
-		static std :: mt19937 rnd(std :: random_device{}());
 
 		if (depleted) {
 			return Piece :: EMPTY;
