@@ -25,7 +25,7 @@ TrainContext :: TrainContext(
 
 	optimizer = std :: make_unique<torch :: optim :: Adam>(
 		params,
-		torch :: optim :: AdamOptions(1e-4)
+		torch :: optim :: AdamOptions(1e-3)
 	);
 
 	if (opt_path.empty() || ! std :: filesystem :: exists(opt_path)) {
@@ -55,7 +55,7 @@ TrainContext :: TrainContext(
 
 			optimizer = std :: make_unique<torch :: optim :: Adam>(
 				params,
-				torch :: optim :: AdamOptions(1e-4)
+				torch :: optim :: AdamOptions(1e-3)
 			);
 		}
 	}
@@ -94,14 +94,7 @@ std :: pair<float, float> TrainContext :: train(const std :: vector<TetrisTrainD
 	auto V_out = output -> elements()[0].toTensor();
 	auto P_out = output -> elements()[1].toTensor();
 
-	auto V_diff = V_out - V;
-	auto V_loss = torch :: where(
-		V_diff < 0,
-		2.0 * V_diff.square(),
-		V_diff.square()
-	).mean();
-
-	// auto V_loss = torch :: mse_loss(V_out, V);
+	auto V_loss = torch :: mse_loss(V_out, V);
 
 	auto P_log = torch :: log_softmax(P_out, 1);
 	auto P_losses = - (P * P_log).sum(1);
