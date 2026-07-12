@@ -121,6 +121,7 @@ TetrisTrainData TetrisBuffer :: sample_by_id(int u) {
 	bin_ifs.read(reinterpret_cast<char *>(data.seq), sizeof(data.seq));
 	bin_ifs.read(reinterpret_cast<char *>(data.info), sizeof(data.info));
 	bin_ifs.read(reinterpret_cast<char *>(& data.V), sizeof(data.V));
+	bin_ifs.read(reinterpret_cast<char *>(& data.key), sizeof(data.key));
 	bin_ifs.read(reinterpret_cast<char *>(& data.PW), sizeof(data.PW));
 
 	data.u.resize(data.len);
@@ -259,6 +260,7 @@ void TetrisBuffer :: rebuild_sort_idx() {
 			bin_ifs.read(reinterpret_cast<char *>(data.seq), sizeof(data.seq));
 			bin_ifs.read(reinterpret_cast<char *>(data.info), sizeof(data.info));
 			bin_ifs.read(reinterpret_cast<char *>(& data.V), sizeof(data.V));
+			bin_ifs.read(reinterpret_cast<char *>(& data.key), sizeof(data.key));
 			bin_ifs.read(reinterpret_cast<char *>(& data.PW), sizeof(data.PW));
 
 			data.u.resize(data.len);
@@ -268,7 +270,7 @@ void TetrisBuffer :: rebuild_sort_idx() {
 			bin_ifs.read(reinterpret_cast<char *>(data.P.data()), data.len * sizeof(float));
 
 			uint32_t tid = id + file_id * g;
-			SortIndex sti {data.V, tid};
+			SortIndex sti {data.key, tid};
 			sort_index.push_back(sti);
 		}
 
@@ -305,6 +307,7 @@ void TetrisBuffer :: add_game(const TetrisTrainData & data) {
 	bin_ofs.write(reinterpret_cast<const char *> (data.seq), sizeof(data.seq));
 	bin_ofs.write(reinterpret_cast<const char *> (data.info), sizeof(data.info));
 	bin_ofs.write(reinterpret_cast<const char *> (& data.V), sizeof(data.V));
+	bin_ofs.write(reinterpret_cast<const char *> (& data.key), sizeof(data.key));
 	bin_ofs.write(reinterpret_cast<const char *> (& data.PW), sizeof(data.PW));
 
 	uint32_t len = data.len;
@@ -319,7 +322,7 @@ void TetrisBuffer :: add_game(const TetrisTrainData & data) {
 
 	idx_ofs.write(reinterpret_cast<const char *> (& idx), sizeof(TetrisDataIndex));
 
-	SortIndex sid {data.V, static_cast<uint32_t>(tot)};
+	SortIndex sid {data.key, static_cast<uint32_t>(tot)};
 	sort_index.push_back(sid);
 
 	int siz = sort_index.size();

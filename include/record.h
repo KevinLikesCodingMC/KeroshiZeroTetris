@@ -12,11 +12,10 @@ struct TetrisTrainData {
 	uint16_t b[30];
 	uint8_t seq[10];
 	float info[10];
-	float V;
+	float V, key, PW; // Policy Loss Weight
 	int len;
 	std :: vector<uint16_t> u;
 	std :: vector<float> P;
-	float PW = 1; // Policy Loss Weight
 };
 
 #endif //KEROSHIZEROTETRIS_RECORD_H
