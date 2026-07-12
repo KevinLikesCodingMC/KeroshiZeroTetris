@@ -56,7 +56,7 @@ struct TetrisBuffer {
 
 	TetrisTrainData sample_recent();
 
-	TetrisTrainData sample_high_V();
+	TetrisTrainData sample_high_V(int len = - 1);
 };
 
 #endif //KEROSHIZEROTETRIS_BUFFER_H
