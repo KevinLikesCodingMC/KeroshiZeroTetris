@@ -25,29 +25,7 @@ bool is_end(const Tetris & t) {
 }
 
 float get_V(const Tetris & t) {
-	return t.attack + (t.is_over() ? - 20.f : 0.f);
-}
-
-// TUNING:
-float get_ex_V(const Tetris & t, bool o = false) {
-	if (! o) return 0;
-
-	int top = 30;
-	for (int y = 29; y >= 0; y --) {
-		if (t.b[y]) break;
-		top = y;
-	}
-	int val = 20 - top;
-	return val * 0.7f;
-}
-
-int get_top(const Tetris & t) {
-	int top = 30;
-	for (int y = 29; y >= 0; y --) {
-		if (t.b[y]) break;
-		top = y;
-	}
-	return top;
+	return t.attack;
 }
 
 void random_mask(TetrisTrainData & data) {
@@ -64,41 +42,35 @@ std :: vector<TetrisTrainData> get_samples(int sample, TetrisBuffer & buffer) {
 	std :: vector<TetrisTrainData> samples;
 	if (buffer.tot == 0) return samples;
 
-	for (int _ = 0; _ < sample; _ ++) {
+	auto V_max_data = buffer.sample_by_sort_id(buffer.tot - 1);
+	float V_max = V_max_data.key;
+
+	int len = buffer.tot / 2 + 1;
+
+	for (int _ = 0; _ < sample / 2; _ ++) {
 		auto data = buffer.sample_recent();
+		samples.push_back(data);
+	}
+	for (int _ = 0; _ < sample / 2; _ ++) {
+		auto data = buffer.sample_high_V(len);
 		samples.push_back(data);
 	}
 
 	for (auto & data : samples) {
+		data.PW = std :: powf((data.key + 1) / (V_max + 1), 1);
+		if (data.PW < 0) data.PW = 0;
+		if (data.PW > 1) data.PW = 1;
 		random_mask(data);
 	}
 
 	return samples;
 }
 
-float keroshi_sigmond(float x) {
-	if (x < 0) return std :: exp(0.3f * x);
-	return 2 - std :: exp(- 0.1f * x);
-}
-
 void init_game(Tetris & tetris, TetrisBuffer & buffer) {
 
-	tetris = Tetris(0);
+	tetris = Tetris();
 	tetris.rest_pieces = 35;
 
-	// static std :: mt19937 rnd(std :: random_device {}());
-	// std :: uniform_int_distribution dist(10, 40);
-	// tetris.rest_pieces = dist(rnd);
-
-	// static std :: mt19937 rnd(std :: random_device {}());
-	// std :: bernoulli_distribution dist(0.8);
-	//
-	// if (dist(rnd) && buffer.tot > 0) {
-	// 	auto data = buffer.sample_high_V();
-	// 	for (int i = 0; i < 17; i ++) {
-	// 		tetris.b[i] = data.b[i];
-	// 	}
-	// }
 }
 
 
@@ -153,16 +125,13 @@ int main(int argc, char * argv []) {
 	);
 
 	TetrisBuffer buffer(data_path, 50000, 100000);
-	// buffer.load_sort_idx();
+	buffer.load_sort_idx();
 
 	std :: vector<Tetris> tetris(batch);
 	std :: vector<std :: vector<TetrisTrainData>> train_data(batch);
-	std :: vector<float> base(batch);
 
 	for (int I = 0; I < batch; I ++) {
 		init_game(tetris[I], buffer);
-		auto [V, _] = trainer.predict(tetris[I]);
-		base[I] = V;
 	}
 
 	std :: string log_file = "log_" + std :: to_string(std :: time(nullptr)) + ".log";
@@ -174,15 +143,6 @@ int main(int argc, char * argv []) {
 		std :: vector<MCTS<Tetris>> mcts(batch);
 		std :: vector<float> fst(batch);
 
-		std :: vector<bool> tag(batch);
-
-		for (int I = 0; I < batch; I ++) {
-			// auto & t = tetris[I];
-			// int height = get_top(t);
-			// tag[I] = height > 15;
-			tag[I] = true;
-		}
-
 		Timer timer;
 
 		{
@@ -191,13 +151,14 @@ int main(int argc, char * argv []) {
 				g[I] = tetris[I];
 				mcts[I].root_game = tetris[I];
 				mcts[I].root_game.depleted = true;
+				mcts[I].C = 10;
 			}
 
 			auto [V, P] = trainer.predict_batch(g);
 
 			fst = V;
 			for (int I = 0; I < batch; I ++) {
-				fst[I] += g[I].attack + get_ex_V(g[I], tag[I]);
+				fst[I] += get_V(g[I]);
 			}
 		}
 
@@ -213,12 +174,12 @@ int main(int argc, char * argv []) {
 			}
 			auto [V, P_t] = trainer.predict_batch(g);
 			for (int I = 0; I < batch; I ++) {
-				float Q = get_ex_V(g[I], tag[I]) - fst[I];
+				float Q = - fst[I];
 				if (is_end(g[I])) {
 					Q += get_V(g[I]);
 				}
 				else {
-					Q += g[I].attack + V[I];
+					Q += get_V(g[I]) + V[I];
 				}
 
 				if (g[I].is_leaf()) {
@@ -247,10 +208,9 @@ int main(int argc, char * argv []) {
 			if (is_end(tetris[I])) {
 
 				float V = get_V(tetris[I]);
-				float PW = keroshi_sigmond(V - base[I]);
 				for (auto & h : train_data[I]) {
 					h.V = V - h.V;
-					h.PW = PW;
+					h.key = V;
 				}
 
 				buffer.add_game(train_data[I]);
@@ -280,8 +240,6 @@ int main(int argc, char * argv []) {
 				}
 
 				init_game(tetris[I], buffer);
-				auto [V0, _] = trainer.predict(tetris[I]);
-				base[I] = V0;
 				games ++;
 			}
 
@@ -290,7 +248,7 @@ int main(int argc, char * argv []) {
 	}
 
 	trainer.save();
-	// buffer.save_sort_idx();
+	buffer.save_sort_idx();
 
 	return 0;
 }
