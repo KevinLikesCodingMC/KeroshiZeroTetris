@@ -79,6 +79,12 @@ add_executable(
 )
 
 add_executable(
+		test_read_buffer
+		test/test_read_buffer.cpp
+		src/buffer.cpp
+)
+
+add_executable(
 		trainer
 		src/trainer.cpp
 		src/model_loader.cpp
