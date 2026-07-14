@@ -135,6 +135,17 @@ add_executable(
 		src/combo.cpp
 )
 
+add_executable(
+		demo_p
+		src/demo_p.cpp
+		src/predict.cpp
+		src/model_loader.cpp
+		src/converter.cpp
+		src/render.cpp
+		src/combo.cpp
+)
+target_link_libraries(demo_p "${TORCH_LIBRARIES}")
+
 install(
 		TARGETS
 		test_mino
