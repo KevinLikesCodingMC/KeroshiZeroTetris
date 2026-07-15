@@ -228,8 +228,7 @@ namespace Converter {
 		data.info[0] = t.can_hold ? 1.f : 0.f;
 		data.info[1] = static_cast<float>(t.combo) / 10.f;
 		data.info[2] = static_cast<float>(std :: log(t.b2b + 1));
-		data.info[3] = static_cast<float>(t.pieces);
-		data.info[4] = t.attack;
+		data.info[3] = static_cast<float>(t.rest_pieces);
 
 		auto actions = t.legal();
 		data.len = static_cast<int>(actions.size());
