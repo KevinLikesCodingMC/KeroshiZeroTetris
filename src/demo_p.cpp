@@ -45,17 +45,13 @@ void demo_p(const std :: string & model_path, int simu) {
 	);
 
 	Tetris tetris;
+	tetris.rest_pieces = 35;
 
-	for (int step = 0; step < 35; step ++) {
+	while (tetris.rest_pieces > 0) {
 		if (is_end(tetris)) break;
 
-		if (tetris.pieces == 7) {
-			tetris.pieces = 0;
-			tetris.attack = 0;
-		}
-
 		MCTS<Tetris> mcts;
-		mcts.C = 10;
+		mcts.C = 5;
 
 		float fst;
 
@@ -79,14 +75,22 @@ void demo_p(const std :: string & model_path, int simu) {
 
 		tetris.step(u);
 
-		auto P = mcts.get_P();
+		auto mcts_N = mcts.root -> N;
+		std :: sort(mcts_N.begin(), mcts_N.end());
 
-		// for (float x : P) std :: cout << x << ' ';
-		// std :: cout << std :: endl;
-		// for (float x : mcts.root -> Q) std :: cout << x << ' ';
-		// std :: cout << std :: endl;
-		// std :: cout << std :: endl;
+		for (int x : mcts_N) std :: cout << x << ' ';
+		std :: cout << std :: endl;
+
+		auto mcts_Q = mcts.root -> Q;
+		std :: sort(mcts_Q.begin(), mcts_Q.end());
+
+		for (float x : mcts_Q) std :: cout << x << ' ';
+		std :: cout << std :: endl;
+
+		std :: cout << std :: endl;
 	}
+
+	std :: cout << tetris.attack << std :: endl;
 }
 
 int main(int argc, char * argv []) {
