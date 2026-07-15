@@ -17,3 +17,6 @@ buffer/
 *.mkv
 
 test/model/attack/*.log
+
+# npm
+web/node_modules/
