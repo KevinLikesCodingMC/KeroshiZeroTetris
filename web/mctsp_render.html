@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="UTF-8">
+	<title>ケロシゼロ</title>
+</head>
+<body>
+
+<div class="container p-5">
+
+	<label class="form-label" for="fileName">选择文件：</label>
+	<input type="text" class="form-control" id="fileName">
+	<br>
+	<button class="btn btn-primary" onclick="import_file();">确定</button>
+	<br><br>
+
+	<div class="row">
+		<div class="col-auto">
+			<h1>ケロシゼロ</h1>
+			<div id="tetrisMain"></div>
+		</div>
+		<div class="col-auto">
+			<div id="tetris1"></div>
+		</div>
+		<div class="col-auto">
+			<div id="tetris2"></div>
+		</div>
+		<div class="col-auto">
+			<div id="tetris3"></div>
+		</div>
+	</div>
+
+	<button class="btn btn-primary" onclick="render_next();">Next</button>
+</div>
+
+<script type="module">
+	import "bootstrap/dist/css/bootstrap.min.css";
+
+	import { renderMarkdown } from "/src/keroshi.js";
+	import { renderTetris } from "/src/keroshi.js";
+
+	const tetrisMain = document.getElementById("tetrisMain");
+	const tetris1 = document.getElementById("tetris1");
+	const tetris2 = document.getElementById("tetris2");
+	const tetris3 = document.getElementById("tetris3");
+
+	let text = await fetch("/1.out").then(r => r.text());
+	let lines = text.split(/\r?\n/);
+	let pos = 0;
+	let next = () => lines[pos ++];
+
+	let height = parseInt(next());
+
+	async function import_file() {
+		const file_name = document.getElementById("fileName").value;
+		text = await fetch(file_name).then(r => r.text());
+		lines = text.split(/\r?\n/);
+		pos = 0;
+		height = parseInt(next());
+		render_next();
+	}
+	window.import_file = import_file;
+
+	function render_next() {
+		let markdown = "```tetris\n";
+		for (let i = 0; i < height; i ++) {
+			markdown += next();
+			markdown += '\n';
+		}
+		markdown += "```";
+		tetrisMain.innerHTML = renderMarkdown(markdown);
+		renderTetris(tetrisMain);
+
+		const num = next();
+		let type = "";
+
+		markdown = "# " + next() + "  \n";
+		type = next();
+		if (type === "Hold") {
+			markdown += "## Hold";
+		}
+		else {
+			markdown += "```tetris\n";
+			for (let i = 0; i < height; i ++) {
+				markdown += next();
+				markdown += '\n';
+			}
+			markdown += "```";
+		}
+		tetris1.innerHTML = renderMarkdown(markdown);
+		renderTetris(tetris1);
+
+		markdown = "# " + next() + "  \n";
+		type = next();
+		if (type === "Hold") {
+			markdown += "## Hold";
+		}
+		else {
+			markdown += "```tetris\n";
+			for (let i = 0; i < height; i ++) {
+				markdown += next();
+				markdown += '\n';
+			}
+			markdown += "```";
+		}
+		tetris2.innerHTML = renderMarkdown(markdown);
+		renderTetris(tetris2);
+
+		markdown = "# " + next() + "  \n";
+		type = next();
+		if (type === "Hold") {
+			markdown += "## Hold";
+		}
+		else {
+			markdown += "```tetris\n";
+			for (let i = 0; i < height; i ++) {
+				markdown += next();
+				markdown += '\n';
+			}
+			markdown += "```";
+		}
+		tetris3.innerHTML = renderMarkdown(markdown);
+		renderTetris(tetris3);
+
+	}
+	window.render_next = render_next;
+
+</script>
+
+</body>
+</html>
