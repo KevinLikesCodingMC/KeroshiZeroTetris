@@ -138,6 +138,7 @@ void demo_p(const std :: string & model_path, int simu, const std :: string & ou
 			fst = get_V(g) + V;
 		}
 
+		simu ++;
 		for (int K = 0; K < simu; K ++) mcts_single(mcts, predictor, fst);
 
 		int id = mcts.get_best();
@@ -216,9 +217,12 @@ int main(int argc, char * argv []) {
 		std :: exit(EXIT_FAILURE);
 	}
 
+	std :: string output_path = "demo.out";
+	if (argc > 3) output_path = argv[3];
+
 	int simu = simu_number;
 
-	demo_p(model_path, simu, "test.out");
+	demo_p(model_path, simu, output_path);
 
 	return 0;
 }
