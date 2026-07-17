@@ -9,7 +9,7 @@
 #include <vector>
 
 struct TetrisTrainData {
-	uint16_t b[30];
+	uint16_t b[4][30];
 	uint8_t seq[10];
 	float info[10];
 	float V, key, PW; // Policy Loss Weight
