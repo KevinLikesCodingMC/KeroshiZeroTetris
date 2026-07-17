@@ -58,6 +58,7 @@ struct Tetris {
 	Piece cur, nxt[5], hold;
 
 	uint16_t b[30]{};
+	uint16_t his[3][30]{};
 
 	int combo, b2b;
 
@@ -268,6 +269,16 @@ struct Tetris {
 	}
 
 	void place(int x, int y, int r) {
+
+		for (int k = 2; k >= 1; k --) {
+			for (int i = 0; i < 30; i ++) {
+				his[k][i] = his[k - 1][i];
+			}
+		}
+		for (int i = 0; i < 30; i ++) {
+			his[0][i] = b[i];
+		}
+
 		Placement placement {cur, x, y, r};
 		pieces ++;
 
