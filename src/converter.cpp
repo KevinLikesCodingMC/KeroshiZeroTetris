@@ -9,12 +9,17 @@
 namespace Converter {
 
 	at :: Tensor to_board(const Tetris & t) {
-		auto tensor = at :: zeros({1, 1, 30, 10}, at :: kFloat);
+		auto tensor = at :: zeros({1, 4, 30, 10}, at :: kFloat);
 		if (t.is_over()) return tensor;
 
 		auto acc = tensor.accessor<float, 4>();
 		for (int i = 0; i < 30; i ++) for (int j = 0; j < 10; j ++) {
 			if (t.b[i] >> j & 1) acc[0][0][i][j] = 1.f;
+		}
+		for (int k = 0; k < 3; k ++) {
+			for (int i = 0; i < 30; i ++) for (int j = 0; j < 10; j ++) {
+				if (t.his[k][i] >> j & 1) acc[0][k + 1][i][j] = 1.f;
+			}
 		}
 		return tensor;
 	}
@@ -61,7 +66,7 @@ namespace Converter {
 
 	at :: Tensor to_board(const std :: vector<Tetris> & t) {
 		int batch = static_cast<int>(t.size());
-		auto tensor = at :: zeros({batch, 1, 30, 10}, at :: kFloat);
+		auto tensor = at :: zeros({batch, 4, 30, 10}, at :: kFloat);
 		auto acc = tensor.accessor<float, 4>();
 
 		for (int I = 0; I < batch; I ++) {
@@ -69,6 +74,11 @@ namespace Converter {
 
 			for (int i = 0; i < 30; i ++) for (int j = 0; j < 10; j ++) {
 				if (t[I].b[i] >> j & 1) acc[I][0][i][j] = 1.f;
+			}
+			for (int k = 0; k < 3; k ++) {
+				for (int i = 0; i < 30; i ++) for (int j = 0; j < 10; j ++) {
+					if (t[I].his[k][i] >> j & 1) acc[I][k + 1][i][j] = 1.f;
+				}
 			}
 		}
 		return tensor;
@@ -127,11 +137,13 @@ namespace Converter {
 
 	at :: Tensor to_board(const std :: vector<TetrisTrainData> & data) {
 		int batch = static_cast<int>(data.size());
-		auto tensor = at :: zeros({batch, 1, 30, 10}, at :: kFloat);
+		auto tensor = at :: zeros({batch, 4, 30, 10}, at :: kFloat);
 		auto acc = tensor.accessor<float, 4>();
 		for (int I = 0; I < batch; I ++) {
-			for (int y = 0; y < 30; y ++) for (int x = 0; x < 10; x ++) {
-				if (data[I].b[y] >> x & 1) acc[I][0][y][x] = 1.f;
+			for (int k = 0; k < 4; k ++) {
+				for (int y = 0; y < 30; y ++) for (int x = 0; x < 10; x ++) {
+					if (data[I].b[k][y] >> x & 1) acc[I][k][y][x] = 1.f;
+				}
 			}
 		}
 		return tensor;
@@ -219,7 +231,10 @@ namespace Converter {
 	TetrisTrainData to_train_data(Tetris & t, const std :: vector<float> & P) {
 		TetrisTrainData data {};
 
-		for (int i = 0; i < 30; i ++) data.b[i] = t.b[i];
+		for (int i = 0; i < 30; i ++) data.b[0][i] = t.b[i];
+		for (int k = 0; k < 3; k ++) {
+			for (int i = 0; i < 30; i ++) data.b[k + 1][i] = t.his[k][i];
+		}
 
 		data.seq[0] = static_cast<uint8_t>(t.cur);
 		data.seq[1] = static_cast<uint8_t>(t.hold);
