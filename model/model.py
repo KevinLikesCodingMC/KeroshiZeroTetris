@@ -81,9 +81,9 @@ class KeroshiZeroNet(nn.Module):
 	def __init__(self, res_blocks = 6):
 		super().__init__()
 
-		# Board (Batch, 1, 30, 10)
+		# Board (Batch, 4, 30, 10)
 		self.first_conv = nn.Sequential(
-			nn.Conv2d(1, 64, 3, 1, 1, bias = False),
+			nn.Conv2d(4, 64, 3, 1, 1, bias = False),
 			nn.BatchNorm2d(64),
 			nn.ReLU(),
 			nn.Conv2d(64, 64, 3, 1, 1, bias = False),
@@ -111,9 +111,11 @@ class KeroshiZeroNet(nn.Module):
 		self.meta_linear = nn.Linear(160 + 32, 256 - 32)
 
 		self.value = nn.Sequential(
-			nn.Linear(1456, 256),
+			nn.Linear(1456, 512),
 			nn.ReLU(),
-			nn.Linear(256, 1),
+			nn.Linear(512, 128),
+			nn.ReLU(),
+			nn.Linear(128, 1),
 		)
 
 		self.policy = nn.Sequential(
@@ -122,7 +124,7 @@ class KeroshiZeroNet(nn.Module):
 			nn.Linear(512, 1537),
 		)
 
-	# board (Batch, 1, 30, 10)
+	# board (Batch, 4, 30, 10)
 	# seq (Batch, 10)
 	# info (Batch, 10)
 	def forward(self, board, seq, info, mask):
