@@ -12,6 +12,7 @@ target_link_libraries(
 		INTERFACE
 		ftxui::screen
 		ftxui::dom
+		ftxui::component
 )
 
 add_subdirectory(tests)
