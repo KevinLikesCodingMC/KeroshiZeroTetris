@@ -4,4 +4,9 @@ foreach (TEST_SRC ${TEST_SOURCES})
 	get_filename_component(TEST_NAME ${TEST_SRC} NAME_WE)
 	set(TARGET_NAME "test_${TEST_NAME}")
 	add_executable(${TARGET_NAME} ${TEST_SRC})
+	target_link_libraries(
+			${TARGET_NAME}
+			PRIVATE
+			ftxui_lib
+	)
 endforeach ()

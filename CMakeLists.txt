@@ -5,4 +5,13 @@ set(CMAKE_CXX_STANDARD 20)
 
 include_directories(${CMAKE_SOURCE_DIR})
 
+find_package(ftxui REQUIRED)
+add_library(ftxui_lib INTERFACE)
+target_link_libraries(
+		ftxui_lib
+		INTERFACE
+		ftxui::screen
+		ftxui::dom
+)
+
 add_subdirectory(tests)
