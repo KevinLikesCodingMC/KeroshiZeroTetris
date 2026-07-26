@@ -16,4 +16,13 @@ enum class Spin : uint8_t {
 	None, Mini, Full
 };
 
+namespace Board {
+	inline constexpr int WIDTH = 10;
+	inline constexpr int HEIGHT = 30;
+	inline constexpr int NEXT = 5;
+	inline constexpr int SPAWN_X = 5;
+	inline constexpr int SPAWN_Y = 21;
+}
+
+
 #endif //KEROSHIZEROTETRIS_DEF_HPP
