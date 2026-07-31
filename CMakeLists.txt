@@ -5,6 +5,10 @@ set(CMAKE_CXX_STANDARD 20)
 
 include_directories(${CMAKE_SOURCE_DIR})
 
+add_library(core_lib STATIC
+	src/core/tetris.cpp
+)
+
 find_package(ftxui REQUIRED)
 add_library(ftxui_lib INTERFACE)
 target_link_libraries(

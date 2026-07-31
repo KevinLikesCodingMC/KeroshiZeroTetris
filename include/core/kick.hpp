@@ -57,6 +57,15 @@ namespace SRSP {
 		CW, CCW, R180
 	};
 
+	constexpr int get_r(int r, Rotation rotation) {
+		switch (rotation) {
+			case Rotation :: CW : return (r + 1) & 3;
+			case Rotation :: CCW : return (r + 3) & 3;
+			case Rotation :: R180 : return (r + 2) & 3;
+			default : return 0;
+		}
+	}
+
 	constexpr std :: span<const offset> get_kicks(Piece piece, Rotation rotation, int r) {
 		if (piece == Piece :: O || piece == Piece :: EMPTY) {
 			return {};
@@ -74,6 +83,11 @@ namespace SRSP {
 		}
 		return {};
 	}
+
+	struct kick_decode {
+		bool success;
+		int x, y, r;
+	};
 }
 
 #endif //KEROSHIZEROTETRIS_KICK_HPP

@@ -6,7 +6,9 @@
 #define KEROSHIZEROTETRIS_TETRIS_HPP
 
 #include "def.hpp"
+#include "kick.hpp"
 #include <utility>
+#include <vector>
 
 struct Placement {
 	Piece piece;
@@ -54,8 +56,15 @@ public:
 
 	void set_board(int x, int y, bool o);
 	bool get_board(int x, int y);
+	void set_board_row(int y, uint16_t x);
 
-	int get_cur();
+	Piece get_cur();
+	void set_cur(Piece piece);
+	Piece get_hold();
+	Piece get_next(int x);
+
+	std :: vector<int> get_actions();
+
 	bool is_over();
 	float get_V();
 
@@ -76,8 +85,17 @@ private:
 	bool is_occupied(int x, int y);
 	bool is_legal(int x, int y, int r);
 	bool is_grounded(int x, int y, int r);
+
+	bool actions_cache;
+	std :: vector<int> actions;
+
 	std :: pair<int, int> get_spawn();
 
+	SRSP :: kick_decode get_kick(int x, int y, int r, SRSP :: Rotation rotation);
+
+	std :: pair<int, int> das_d(int x, int y, int r);
+
+	void calc_actions();
 };
 
 

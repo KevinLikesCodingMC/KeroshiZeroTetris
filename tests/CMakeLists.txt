@@ -8,5 +8,6 @@ foreach (TEST_SRC ${TEST_SOURCES})
 			${TARGET_NAME}
 			PRIVATE
 			ftxui_lib
+			core_lib
 	)
 endforeach ()
