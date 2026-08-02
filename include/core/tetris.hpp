@@ -16,6 +16,8 @@ struct Placement {
 	Spin spin;
 	int clear;
 	bool pc;
+
+	bool b2b() const;
 };
 
 struct Action {
@@ -32,13 +34,13 @@ struct Action {
 		int x, y, r;
 	};
 
-	static int hold() {
+	static constexpr int hold() {
 		return 0;
 	}
-	static int place(int x, int y, int r) {
+	static constexpr int place(int x, int y, int r) {
 		return (x << 7 | y << 2 | r) + 1;
 	}
-	static ActionDecode decode(int u) {
+	static constexpr ActionDecode decode(int u) {
 		if (u <= 0 || u >= SIZE) return {0, 0, 0};
 		u --;
 		return {
@@ -64,17 +66,23 @@ public:
 	Piece get_next(int x);
 
 	std :: vector<int> get_actions();
+	std :: vector<int> get_gen_actions();
+
+	bool step_player(int action);
+	bool step_gen(int action);
 
 	bool is_over();
+	bool is_player();
+
 	float get_V();
 
 private:
 
-	Piece cur, nxt[5], hold;
+	Piece cur, nxt[5]{}, hold;
 
-	uint16_t board[30];
+	uint16_t board[30]{};
 
-	Placement placement;
+	Placement placement{};
 	int combo, b2b;
 	bool game_over, can_hold;
 	int pieces; int rest_pieces;
@@ -86,16 +94,26 @@ private:
 	bool is_legal(int x, int y, int r);
 	bool is_grounded(int x, int y, int r);
 
-	bool actions_cache;
-	std :: vector<int> actions;
+	bool is_actions_cache;
+	std :: vector<int> actions_cache;
 
 	std :: pair<int, int> get_spawn();
 
 	SRSP :: kick_decode get_kick(int x, int y, int r, SRSP :: Rotation rotation);
+	SRSP :: kick_decode_id get_kick_id(int x, int y, int r, SRSP :: Rotation rotation);
 
 	std :: pair<int, int> das_d(int x, int y, int r);
 
 	void calc_actions();
+
+	void roll();
+	bool use_hold();
+	bool place(int x, int y, int r);
+
+	void check_game_over();
+	Spin check_spin(int x, int y, int r);
+	Spin check_tspin(int x, int y, int r);
+	uint8_t check_tspin_kicks(int x, int y, int r);
 };
 
 

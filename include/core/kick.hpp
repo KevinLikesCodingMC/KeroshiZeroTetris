@@ -88,6 +88,12 @@ namespace SRSP {
 		bool success;
 		int x, y, r;
 	};
+
+	struct kick_decode_id {
+		bool success;
+		int x, y, r;
+		int kick_id;
+	};
 }
 
 #endif //KEROSHIZEROTETRIS_KICK_HPP

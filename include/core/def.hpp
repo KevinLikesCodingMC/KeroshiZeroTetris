@@ -22,6 +22,8 @@ namespace Board {
 	inline constexpr int NEXT = 5;
 	inline constexpr int SPAWN_X = 5;
 	inline constexpr int SPAWN_Y = 21;
+
+	inline constexpr uint16_t BOARD_ROW_FULL = (1u << WIDTH) - 1;
 }
 
 
