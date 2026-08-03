@@ -304,7 +304,15 @@ bool TetrisEnv :: place(int x, int y, int r) {
 
 	auto last_placement = placement;
 	placement = {cur, x, y, r};
-	placement.spin = Spin :: None;
+
+	placement.spin = check_spin(x, y, r);
+
+	is_actions_cache = false;
+
+	for (int i = 0; i < 4; i ++) {
+		auto [X, Y] = Mino :: get(cur, i, r, x, y);
+		set_board(X, Y, true);
+	}
 
 	placement.clear = 0;
 	int write_pos = 0;
@@ -484,4 +492,22 @@ SRSP :: kick_decode_id TetrisEnv :: get_kick_id(
 	}
 
 	return {false};
+}
+
+bool TetrisEnv :: is_over() {
+	return game_over;
+}
+
+bool TetrisEnv :: is_player() {
+	if (cur == Piece :: EMPTY) {
+		return false;
+	}
+
+	for (int i = 0; i < Board :: NEXT; i ++) {
+		if (nxt[i] == Piece :: EMPTY) {
+			return false;
+		}
+	}
+
+	return true;
 }

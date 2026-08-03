@@ -7,7 +7,6 @@
 
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/screen/screen.hpp>
-#include <cassert>
 #include <iostream>
 
 ftxui :: Color get_color(Piece piece) {
@@ -40,7 +39,9 @@ ftxui :: Element get_board(TetrisEnv & tetris, int x, int y, int r) {
 		ftxui :: Elements cols;
 		for (int i = 0; i < Board :: WIDTH; i ++) {
 			bool o = tetris.get_board(i, j);
-			assert(! (o && grid[i][j]));
+			if (o && grid[i][j]) {
+				std :: abort();
+			}
 
 			if (grid[i][j]) {
 				cols.push_back(ftxui :: text("██") | ftxui :: color(color));

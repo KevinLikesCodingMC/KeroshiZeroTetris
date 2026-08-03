@@ -74,8 +74,6 @@ public:
 	bool is_over();
 	bool is_player();
 
-	float get_V();
-
 private:
 
 	Piece cur, nxt[5]{}, hold;
