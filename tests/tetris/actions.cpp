@@ -67,7 +67,7 @@ int main() {
 	tetris.set_board_row(1, 0b1000111001);
 	tetris.set_board_row(0, 0b1101111101);
 
-	auto actions = tetris.get_actions();
+	auto actions = tetris.get_player_actions();
 
 	ftxui :: Elements boards;
 

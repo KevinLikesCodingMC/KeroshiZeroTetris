@@ -65,11 +65,13 @@ public:
 	Piece get_hold();
 	Piece get_next(int x);
 
-	std :: vector<int> get_actions();
 	std :: vector<int> get_gen_actions();
+	std :: vector<int> get_player_actions();
+	std :: vector<int> get_actions();
 
 	bool step_player(int action);
 	bool step_gen(int action);
+	bool step(int action);
 
 	bool is_over();
 	bool is_player();

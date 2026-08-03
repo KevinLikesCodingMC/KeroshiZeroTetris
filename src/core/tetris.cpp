@@ -147,13 +147,18 @@ std :: pair<int, int> TetrisEnv :: das_d(int x, int y, int r) {
 	return {x, y};
 }
 
-std :: vector<int> TetrisEnv :: get_actions() {
+std :: vector<int> TetrisEnv :: get_player_actions() {
 	if (! is_actions_cache) {
 		calc_actions();
 		is_actions_cache = true;
 	}
 
 	return actions_cache;
+}
+
+std :: vector<int> TetrisEnv :: get_actions() {
+	return is_player() ? get_player_actions()
+		: get_gen_actions();
 }
 
 void TetrisEnv :: calc_actions() {
@@ -273,6 +278,11 @@ bool TetrisEnv :: step_player(int action) {
 		success = place(x, y, r);
 	}
 	return success;
+}
+
+bool TetrisEnv :: step(int action) {
+	return is_player() ? step_player(action)
+		: step_gen(action);
 }
 
 bool TetrisEnv :: use_hold() {
@@ -448,7 +458,7 @@ Spin TetrisEnv :: check_tspin(int x, int y, int r) {
 
 uint8_t TetrisEnv :: check_tspin_kicks(int x, int y, int r) {
 
-	auto actions = get_actions();
+	auto actions = get_player_actions();
 	uint8_t res = 0;
 
 	for (int action : actions) {

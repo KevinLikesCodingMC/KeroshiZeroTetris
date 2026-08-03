@@ -21,18 +21,9 @@ int main() {
 	auto step = [&] () {
 		if (tetris.is_over()) return;
 
-		bool success = false;
-
-		if (tetris.is_player()) {
-			auto actions = tetris.get_actions();
-			int u = rnd() % actions.size();
-			success = tetris.step_player(actions[u]);
-		}
-		else {
-			auto actions = tetris.get_gen_actions();
-			int u = rnd() % actions.size();
-			success = tetris.step_gen(actions[u]);
-		}
+		auto actions = tetris.get_actions();
+		int u = rnd() % actions.size();
+		bool success = tetris.step(actions[u]);
 
 		if (! success) {
 			std :: abort();
