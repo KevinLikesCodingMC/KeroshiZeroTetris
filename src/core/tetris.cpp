@@ -278,6 +278,7 @@ bool TetrisEnv :: step_player(int action) {
 bool TetrisEnv :: use_hold() {
 	if (! can_hold) return false;
 	can_hold = false;
+	is_actions_cache = false;
 
 	if (hold == Piece :: EMPTY) {
 		hold = cur;
@@ -345,6 +346,8 @@ bool TetrisEnv :: place(int x, int y, int r) {
 
 	roll();
 	check_game_over();
+
+	can_hold = true;
 
 	pieces ++;
 	rest_pieces --;
