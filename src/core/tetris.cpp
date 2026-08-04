@@ -7,6 +7,7 @@
 
 #include <queue>
 #include <cmath>
+#include <iostream>
 
 
 bool Placement :: b2b() const {
@@ -317,6 +318,8 @@ bool TetrisEnv :: use_hold() {
 		std :: swap(cur, hold);
 	}
 
+	check_game_over();
+
 	return true;
 }
 
@@ -556,4 +559,42 @@ bool TetrisEnv :: is_player() {
 	}
 
 	return true;
+}
+
+void TetrisEnv :: dump() {
+	std :: cout << std :: endl;
+	std :: cout << "Tetris Dump" << std :: endl;
+
+	std :: cout << "Board: " << std :: endl;
+	for (int y = Board :: HEIGHT; y >= 0; y --) {
+		for (int x = 0; x < Board :: WIDTH; x ++) {
+			int o = get_board(x, y);
+			std :: cout << o;
+		}
+		std :: cout << std :: endl;
+	}
+
+	std :: cout << "Pieces" << std :: endl;
+	std :: cout << "cur: " << static_cast<int>(cur) << std :: endl;
+	std :: cout << "hold: " << static_cast<int>(hold) << std :: endl;
+	std :: cout << "next: ";
+	for (int i = 0; i < Board :: NEXT; i ++) {
+		std :: cout << static_cast<int>(nxt[i]) << ' ';
+	}
+	std :: cout << std :: endl;
+	std :: cout << "Actions: " << std :: endl;
+	calc_actions();
+	for (int action : actions_cache) {
+		if (action == Action :: hold()) {
+			std :: cout << "Hold" << std :: endl;
+		}
+		else {
+			auto [x, y, r] = Action :: decode(action);
+			std :: cout << x << ' ' << y << ' ' << r << std :: endl;
+		}
+	}
+	std :: cout << std :: endl;
+	std :: cout << "Placement" << std :: endl;
+	std :: cout << "clear: " << placement.clear << std :: endl;
+	std :: cout << "Over：" << game_over << std :: endl;
 }

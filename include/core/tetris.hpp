@@ -85,6 +85,8 @@ public:
 	bool is_over();
 	bool is_player();
 
+	void dump();
+
 private:
 
 	Piece cur, nxt[5]{}, hold;
