@@ -7,8 +7,11 @@
 
 #include "def.hpp"
 #include "kick.hpp"
+#include "scoring.hpp"
+
 #include <utility>
 #include <vector>
+#include <memory>
 
 struct Placement {
 	Piece piece;
@@ -65,6 +68,12 @@ public:
 	Piece get_hold();
 	Piece get_next(int x);
 
+	float get_attack();
+	void set_rest_pieces(int piece);
+	int get_rest_pieces();
+
+	void set_attack_calc(std :: shared_ptr<Scoring :: Calculator> calc);
+
 	std :: vector<int> get_gen_actions();
 	std :: vector<int> get_player_actions();
 	std :: vector<int> get_actions();
@@ -89,6 +98,8 @@ private:
 	float attack;
 
 	int bag_piece; uint8_t bag_use;
+
+	std :: shared_ptr<Scoring :: Calculator> attack_calc;
 
 	bool is_occupied(int x, int y);
 	bool is_legal(int x, int y, int r);

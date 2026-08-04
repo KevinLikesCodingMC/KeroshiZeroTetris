@@ -46,6 +46,8 @@ TetrisEnv :: TetrisEnv() {
 	// Actions Cache
 	is_actions_cache = false;
 
+	// Attack Calculator
+	attack_calc = std :: make_shared<Scoring :: line_sq>();
 }
 
 void TetrisEnv :: reset() {
@@ -86,6 +88,23 @@ Piece TetrisEnv :: get_next(int x) {
 		return Piece :: EMPTY;
 	}
 	return nxt[x];
+}
+
+float TetrisEnv :: get_attack() {
+	return attack;
+}
+
+void TetrisEnv :: set_rest_pieces(int piece) {
+	rest_pieces = piece;
+}
+int TetrisEnv :: get_rest_pieces() {
+	return rest_pieces;
+}
+
+void TetrisEnv :: set_attack_calc(
+	std :: shared_ptr<Scoring :: Calculator> calc
+) {
+	attack_calc = std :: move(calc);
 }
 
 bool TetrisEnv :: is_occupied(int x, int y) {
@@ -338,12 +357,26 @@ bool TetrisEnv :: place(int x, int y, int r) {
 		board[write_pos ++] = 0;
 	}
 
+	bool pc = true;
+	for (int row = 0; row < Board :: HEIGHT; row ++) {
+		pc &= board[row] == 0;
+	}
+	placement.pc = pc;
+
 	if (last_placement.clear && placement.clear) {
 		combo ++;
 	}
 	if (placement.clear == 0) {
 		combo = 0;
 	}
+
+	attack += attack_calc -> calc({
+		placement.clear,
+		placement.spin,
+		combo,
+		b2b,
+		placement.pc,
+	});
 
 	bool b2b_l = last_placement.b2b();
 	bool b2b_r = placement.b2b();
@@ -508,7 +541,7 @@ SRSP :: kick_decode_id TetrisEnv :: get_kick_id(
 }
 
 bool TetrisEnv :: is_over() {
-	return game_over;
+	return game_over || rest_pieces <= 0;
 }
 
 bool TetrisEnv :: is_player() {
