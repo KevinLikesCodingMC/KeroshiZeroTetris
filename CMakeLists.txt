@@ -6,8 +6,10 @@ set(CMAKE_CXX_STANDARD 20)
 include_directories(${CMAKE_SOURCE_DIR})
 
 add_library(core_lib STATIC
+		src/core/scoring.cpp
 		src/core/tetris.cpp
 		src/ui/tetris_ftxui.cpp
+		src/ai/mcts.cpp
 )
 
 find_package(ftxui REQUIRED)
@@ -19,5 +21,7 @@ target_link_libraries(
 		ftxui::dom
 		ftxui::component
 )
+
+find_package(OpenMP REQUIRED)
 
 add_subdirectory(tests)

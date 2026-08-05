@@ -9,5 +9,6 @@ foreach (TEST_SRC ${TEST_SOURCES})
 			PRIVATE
 			ftxui_lib
 			core_lib
+			OpenMP::OpenMP_CXX
 	)
 endforeach ()
