@@ -62,6 +62,7 @@ public:
 	void set_board(int x, int y, bool o);
 	bool get_board(int x, int y);
 	void set_board_row(int y, uint16_t x);
+	uint16_t get_board_row(int y);
 
 	Piece get_cur();
 	void set_cur(Piece piece);
@@ -71,6 +72,9 @@ public:
 	float get_attack();
 	void set_rest_pieces(int piece);
 	int get_rest_pieces();
+	int get_combo();
+	int get_b2b();
+	bool is_can_hold();
 
 	void set_attack_calc(std :: shared_ptr<Scoring :: Calculator> calc);
 
@@ -89,9 +93,9 @@ public:
 
 private:
 
-	Piece cur, nxt[5]{}, hold;
+	Piece cur, nxt[Board :: NEXT]{}, hold;
 
-	uint16_t board[30]{};
+	uint16_t board[Board :: HEIGHT]{};
 
 	Placement placement{};
 	int combo, b2b;

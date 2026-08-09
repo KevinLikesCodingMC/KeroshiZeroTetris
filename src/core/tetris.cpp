@@ -75,6 +75,10 @@ void TetrisEnv :: set_board_row(int y, uint16_t x) {
 	board[y] = x;
 }
 
+uint16_t TetrisEnv :: get_board_row(int y) {
+	return board[y];
+}
+
 Piece TetrisEnv :: get_cur() {
 	return cur;
 }
@@ -100,6 +104,15 @@ void TetrisEnv :: set_rest_pieces(int piece) {
 }
 int TetrisEnv :: get_rest_pieces() {
 	return rest_pieces;
+}
+int TetrisEnv :: get_b2b() {
+	return b2b;
+}
+int TetrisEnv :: get_combo() {
+	return combo;
+}
+bool TetrisEnv :: is_can_hold() {
+	return can_hold;
 }
 
 void TetrisEnv :: set_attack_calc(
