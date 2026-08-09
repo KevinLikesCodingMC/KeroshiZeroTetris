@@ -1,14 +1,39 @@
-file(GLOB_RECURSE TEST_SOURCES "*.cpp")
+add_executable(
+		test_tetris_mino
+		tetris/mino.cpp
+)
+target_link_libraries(
+		test_tetris_mino
+		PRIVATE
+		tetris_ui
+)
 
-foreach (TEST_SRC ${TEST_SOURCES})
-	get_filename_component(TEST_NAME ${TEST_SRC} NAME_WE)
-	set(TARGET_NAME "test_${TEST_NAME}")
-	add_executable(${TARGET_NAME} ${TEST_SRC})
-	target_link_libraries(
-			${TARGET_NAME}
-			PRIVATE
-			ftxui_lib
-			core_lib
-			OpenMP::OpenMP_CXX
-	)
-endforeach ()
+add_executable(
+		test_tetris_random
+		tetris/random.cpp
+)
+target_link_libraries(
+		test_tetris_random
+		PRIVATE
+		tetris_ui
+)
+
+add_executable(
+		test_tetris_actions
+		tetris/actions.cpp
+)
+target_link_libraries(
+		test_tetris_actions
+		PRIVATE
+		tetris_ui
+)
+
+add_executable(
+		test_model_player_value
+		model/player_value.cpp
+)
+target_link_libraries(
+		test_model_player_value
+		PRIVATE
+		tetris_ai
+)
