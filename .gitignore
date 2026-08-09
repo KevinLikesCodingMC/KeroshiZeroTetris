@@ -3,3 +3,6 @@
 
 # Cmake
 cmake-build-*/
+
+# Torch Model
+*.pt
