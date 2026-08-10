@@ -36,7 +36,7 @@ public:
 		return elapsed_us() / 1e6;
 	}
 
-	void log_elapsed(const std :: string & msg) const {
+	void log_elapsed(const std :: string & msg = "") const {
 		double t = elapsed_us();
 
 		if (t < 1e3) {

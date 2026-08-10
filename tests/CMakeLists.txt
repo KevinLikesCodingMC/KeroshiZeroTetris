@@ -29,11 +29,11 @@ target_link_libraries(
 )
 
 add_executable(
-		test_model_player_value
-		model/player_value.cpp
+		test_model_value_speed
+		model/value_speed.cpp
 )
 target_link_libraries(
-		test_model_player_value
+		test_model_value_speed
 		PRIVATE
 		tetris_ai
 )
