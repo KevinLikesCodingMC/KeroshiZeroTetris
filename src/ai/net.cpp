@@ -4,8 +4,10 @@
 
 #include "include/ai/net.hpp"
 #include "include/utils/logger.hpp"
+#include "include/ai/converter.hpp"
 
 #include <filesystem>
+
 
 TetrisNet :: TetrisNet(const std :: string & path, bool cuda)
 	: device(torch :: kCPU) {

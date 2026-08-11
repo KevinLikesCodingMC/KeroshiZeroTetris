@@ -6,7 +6,6 @@
 #define KEROSHIZEROTETRIS_NET_HPP
 
 #include "include/core/tetris.hpp"
-#include "converter.hpp"
 
 #include <torch/torch.h>
 #include <torch/script.h>
