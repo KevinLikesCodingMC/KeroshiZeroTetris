@@ -43,6 +43,7 @@ add_library(tetris_ai  STATIC
 		src/ai/mcts.cpp
 		src/ai/converter.cpp
 		src/ai/net.cpp
+		src/ai/buffer.cpp
 )
 target_link_libraries(
 		tetris_ai PRIVATE

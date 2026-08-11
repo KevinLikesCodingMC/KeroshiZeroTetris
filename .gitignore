@@ -6,3 +6,6 @@ cmake-build-*/
 
 # Torch Model
 *.pt
+
+# Datset
+*.bin

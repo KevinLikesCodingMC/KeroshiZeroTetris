@@ -37,3 +37,13 @@ target_link_libraries(
 		PRIVATE
 		tetris_ai
 )
+
+add_executable(
+		test_buffer
+		buffer/buffer.cpp
+)
+target_link_libraries(
+		test_buffer
+		PRIVATE
+		tetris_ai
+)
