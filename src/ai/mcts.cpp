@@ -5,6 +5,7 @@
 #include "include/ai/mcts.hpp"
 
 #include <cmath>
+#include <random>
 
 
 void TetrisMCTS :: set_C(float c) {
@@ -89,6 +90,30 @@ void TetrisMCTS :: back(float V) {
 		// Q -> (Q * N + V) / (N + 1) = Q + (V - Q) / (N + 1)
 		pos -> Q[a] += (V - pos -> Q[a]) / pos -> N[a];
 	}
+}
+
+void TetrisMCTS :: noise(float alpha, float epsilon) {
+	if (root == nullptr) return;
+
+	thread_local  std :: mt19937 rnd(std :: random_device{}());
+	std :: gamma_distribution gamma(alpha, 1.f);
+
+	int n = root -> n;
+	if (n == 0) return;
+
+	float sum = 0;
+	std :: vector<float> p(n);
+
+	for (int i = 0; i < n; i ++) {
+		p[i] = gamma(rnd);
+		sum += p[i];
+	}
+
+	for (int i = 0; i < n; i ++) {
+		p[i] /= sum;
+		root -> P[i] = (1.f - epsilon) * root -> P[i] + epsilon * p[i];
+	}
+
 }
 
 std :: pair<int, int> TetrisMCTS :: best_action() {

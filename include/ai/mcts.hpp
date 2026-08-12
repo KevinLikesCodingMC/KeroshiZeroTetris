@@ -25,13 +25,14 @@ public:
 	TetrisMCTS() = default;
 
 	void set_C(float c);
-
 	void set_root(const TetrisEnv & tetris);
 
 	std :: vector<int> get_root_N();
 
 	TetrisEnv select();
 	void back(float V);
+
+	void noise(float alpha = 0.3f, float epsilon = 0.25f);
 
 	std :: pair<int, int> best_action();
 
