@@ -94,6 +94,7 @@ TetrisValueTrainNet :: TetrisValueTrainNet(
 	optimizer = std :: make_unique<torch :: optim :: Adam>(
 		params,
 		torch :: optim :: AdamOptions(1e-3)
+			.weight_decay(1e-4)
 	);
 
 	if (opt_path.empty() || ! std :: filesystem :: exists(opt_path)) {
@@ -127,4 +128,26 @@ void TetrisValueTrainNet :: save(const std :: string & path) {
 		Logger :: error("optimizer <", path + ".opt", "> saving failed.");
 		throw std :: runtime_error(e.what());
 	}
+}
+
+float TetrisValueTrainNet :: train(const std :: vector<Dataset :: player_value> & data) {
+
+	auto board = Converter :: to_tensor_board(data).to(device);
+	auto piece = Converter :: to_tensor_piece(data).to(device);
+	auto info = Converter :: to_tensor_info(data).to(device);
+	auto V = Converter :: to_tensor_V(data).to(device);
+
+	module.train();
+	optimizer -> zero_grad();
+
+	auto V_out = module.forward({
+		board, piece, info
+	}).toTensor();
+
+	auto loss = torch :: mse_loss(V_out, V);
+
+	loss.backward();
+	optimizer -> step();
+
+	return loss.item<float>();
 }
