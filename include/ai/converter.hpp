@@ -20,6 +20,12 @@ namespace Converter {
 	at :: Tensor to_tensor_piece(TetrisEnv & tetris);
 	at :: Tensor to_tensor_info(TetrisEnv & tetris);
 
+	// Dataset to Tensor
+	at :: Tensor to_tensor_board(const std :: vector<Dataset :: player_value> & data);
+	at :: Tensor to_tensor_piece(const std :: vector<Dataset :: player_value> & data);
+	at :: Tensor to_tensor_info(const std :: vector<Dataset :: player_value> & data);
+	at :: Tensor to_tensor_V(const std :: vector<Dataset :: player_value> & data);
+
 };
 
 

@@ -67,4 +67,62 @@ namespace Converter {
 
 		return tensor;
 	}
+
+	at :: Tensor to_tensor_board(const std :: vector<Dataset :: player_value> & data) {
+		int batch = data.size();
+		auto tensor = at :: zeros({batch, 1, Board :: HEIGHT, Board :: WIDTH}, at :: kFloat);
+
+		auto acc = tensor.accessor<float, 4>();
+		for (int I = 0; I < batch; I ++) {
+			for (int y = 0; y < Board :: HEIGHT; y ++) {
+				for (int x = 0; x < Board :: WIDTH; x ++) {
+					int o = data[I].board[y] >> x & 1;
+					acc[I][0][y][x] = o ? 1.f : 0.f;
+				}
+			}
+		}
+
+		return tensor;
+	}
+
+	at :: Tensor to_tensor_piece(const std :: vector<Dataset :: player_value> & data) {
+		int batch = data.size();
+		auto tensor = at :: zeros({batch, Dataset :: PIECE_CAPACITY}, at :: kLong);
+
+		auto acc = tensor.accessor<int64_t, 2>();
+		for (int I = 0; I < batch; I ++) {
+			for (int i = 0; i < Dataset :: PIECE_CAPACITY; i ++) {
+				acc[I][i] = static_cast<int64_t>(data[I].piece[i]);
+			}
+		}
+
+		return tensor;
+	}
+
+	at :: Tensor to_tensor_info(const std :: vector<Dataset :: player_value> & data) {
+		int batch = data.size();
+		auto tensor = at :: zeros({batch, Dataset :: INFO_CAPACITY}, at :: kFloat);
+
+		auto acc = tensor.accessor<float, 2>();
+		for (int I = 0; I < batch; I ++) {
+			for (int i = 0; i < Dataset :: INFO_CAPACITY; i ++) {
+				acc[I][i] = data[I].info[i];
+			}
+		}
+
+		return tensor;
+	}
+
+	at :: Tensor to_tensor_V(const std :: vector<Dataset :: player_value> & data) {
+		int batch = data.size();
+		auto tensor = at :: zeros({batch, 1}, at :: kFloat);
+
+		auto acc = tensor.accessor<float, 2>();
+		for (int I = 0; I < batch; I ++) {
+			acc[I][0] = data[I].V;
+		}
+
+		return tensor;
+	}
+
 }
