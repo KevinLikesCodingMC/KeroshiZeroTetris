@@ -26,7 +26,6 @@ public:
 
 	void set_C(float c);
 	void set_root(const TetrisEnv & tetris);
-
 	std :: vector<int> get_root_N();
 
 	TetrisEnv select();
@@ -35,6 +34,7 @@ public:
 	void noise(float alpha = 0.3f, float epsilon = 0.25f);
 
 	std :: pair<int, int> best_action();
+	std :: pair<int, int> temp_action(float temp = 1.0);
 
 private:
 	float C = 1;

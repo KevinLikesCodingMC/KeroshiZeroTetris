@@ -134,3 +134,40 @@ std :: pair<int, int> TetrisMCTS :: best_action() {
 
 	return {id, root -> actions[id]};
 }
+
+std :: pair<int, int> TetrisMCTS :: temp_action(float temp) {
+
+	if (temp <= 1e-2f) return best_action();
+
+	if (root == nullptr) {
+		int id = 0;
+		auto actions = root_tetris.get_actions();
+		return {id, actions[id]};
+	}
+
+	// to softmax
+	int n = root -> n;
+	std :: vector<float> x(n);
+	float x_max = 1e-9;
+	for (int i = 0; i < n; i ++) {
+		x[i] = std :: logf(root -> N[i] + 1) / temp;
+		x_max = std :: max(x_max, x[i]);
+	}
+
+	float sum = 0;
+	std :: vector<float> p(n);
+	for (int i = 0; i < n; i ++) {
+		x[i] -= x_max;
+		p[i] = std :: expf(x[i]);
+		sum += p[i];
+	}
+	for (int i = 0; i < n; i ++) {
+		p[i] /= sum;
+	}
+
+	thread_local  std :: mt19937 rnd(std :: random_device{}());
+	std :: discrete_distribution dist(p.begin(), p.end());
+
+	int id = dist(rnd);
+	return {id, root -> actions[id]};
+}
