@@ -53,4 +53,4 @@ class ModelPlayer(nn.Module):
 if __name__ == '__main__':
 	model = ModelPlayer()
 	script_model = torch.jit.script(model)
-	script_model.save("value_player_1.pt")
+	script_model.save("value_1.pt")

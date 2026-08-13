@@ -47,3 +47,13 @@ target_link_libraries(
 		PRIVATE
 		tetris_ai
 )
+
+add_executable(
+		test_model_value_batch_speed
+		model/value_batch_speed.cpp
+)
+target_link_libraries(
+		test_model_value_batch_speed
+		PRIVATE
+		tetris_ai
+)
