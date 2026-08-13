@@ -19,10 +19,6 @@ target_link_libraries(
 
 find_package(OpenMP REQUIRED)
 
-if(UNIX)
-	list(APPEND CMAKE_PREFIX_PATH "/opt/libtorch")
-endif()
-
 find_package(Torch REQUIRED)
 
 add_library(tetris_core STATIC
