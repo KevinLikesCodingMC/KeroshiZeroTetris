@@ -19,6 +19,10 @@ target_link_libraries(
 
 find_package(OpenMP REQUIRED)
 
+if(MSVC)
+	set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -allow-unsupported-compiler")
+endif()
+
 find_package(Torch REQUIRED)
 
 add_library(tetris_core STATIC
