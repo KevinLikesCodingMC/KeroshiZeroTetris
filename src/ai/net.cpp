@@ -70,13 +70,32 @@ torch :: Tensor TetrisValueNet :: predict(
 }
 
 float TetrisValueNet :: predict(TetrisEnv & tetris) {
-	auto board = Converter :: to_tensor_board(tetris);
-	auto piece = Converter :: to_tensor_piece(tetris);
-	auto info = Converter :: to_tensor_info(tetris);
+	auto board = Converter :: to_tensor_board(tetris).to(device);
+	auto piece = Converter :: to_tensor_piece(tetris).to(device);
+	auto info = Converter :: to_tensor_info(tetris).to(device);
 
 	auto output = predict(board, piece, info);
 
 	return output.cpu().item<float>();
+}
+
+std :: vector<float> TetrisValueNet :: predict(
+	std :: vector<TetrisEnv> & tetris
+) {
+	auto board = Converter :: to_tensor_board(tetris).to(device);
+	auto piece = Converter :: to_tensor_piece(tetris).to(device);
+	auto info = Converter :: to_tensor_info(tetris).to(device);
+
+	auto output = predict(board, piece, info);
+	output = output.to(torch :: kCPU);
+
+	auto acc = output.accessor<float, 2>();
+	std :: vector<float> res(tetris.size());
+	for (int i = 0; i < res.size(); i ++) {
+		res[i] = acc[i][0];
+	}
+
+	return res;
 }
 
 TetrisValueTrainNet :: TetrisValueTrainNet(

@@ -34,6 +34,8 @@ public:
 	);
 
 	float predict(TetrisEnv & tetris);
+	std :: vector<float> predict(std :: vector<TetrisEnv> & tetris);
+
 };
 
 class TetrisValueTrainNet : public TetrisValueNet {
