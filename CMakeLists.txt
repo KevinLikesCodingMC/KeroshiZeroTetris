@@ -3,7 +3,11 @@ project(KeroshiZeroTetris)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_compile_options(-O3)
+if(UNIX)
+	add_compile_options(-O3)
+elseif(MSVC)
+	add_compile_options(/utf-8)
+endif()
 
 include_directories(${CMAKE_SOURCE_DIR})
 
