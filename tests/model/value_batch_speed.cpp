@@ -7,19 +7,20 @@
 
 void usage(const char * prg) {
 	std :: cout << "Usage:" << std :: endl;
-	std :: cout << prg << " <model_path> <batch>" << std :: endl;
+	std :: cout << prg << " <model_path> <cuda> <batch>" << std :: endl;
 }
 
 int main(int argc, char * argv []) {
-	if (argc < 3) {
+	if (argc < 4) {
 		usage(argv[0]);
 		return 1;
 	}
 
 	std :: string model_path = argv[1];
-	int batch = std :: stoi(argv[2]);
+	bool cuda = std :: stoi(argv[2]) != 0;
+	int batch = std :: stoi(argv[3]);
 
-	TetrisValueNet net(model_path, true);
+	TetrisValueNet net(model_path, cuda);
 
 	std :: vector<TetrisEnv> tetris(batch);
 	for (int i = 0; i < batch; i ++) {
