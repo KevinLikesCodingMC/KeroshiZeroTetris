@@ -1,0 +1,9 @@
+add_executable(
+		benchmark_model_value_batch
+		model_value_batch/benchmark.cpp
+)
+target_link_libraries(
+		benchmark_model_value_batch
+		PRIVATE
+		tetris_ai
+)
