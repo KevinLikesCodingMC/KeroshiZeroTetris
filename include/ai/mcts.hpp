@@ -35,6 +35,9 @@ public:
 	void set_V_base(float V);
 
 	std :: pair<TetrisEnv, Node *> select();
+
+	std :: vector<std :: pair<TetrisEnv, Node *>> select_layer();
+
 	void back(Node * pos, float V);
 
 	void noise(float alpha = 0.3f, float epsilon = 0.25f);

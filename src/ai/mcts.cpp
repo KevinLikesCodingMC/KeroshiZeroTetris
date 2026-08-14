@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include <random>
+#include <functional>
 
 
 void TetrisMCTS :: set_C(float c) {
@@ -114,6 +115,38 @@ std :: pair<TetrisEnv, TetrisMCTS :: Node *> TetrisMCTS :: select() {
 	return {tetris, pos};
 }
 
+std :: vector<std :: pair<TetrisEnv, TetrisMCTS :: Node *>>
+TetrisMCTS :: select_layer() {
+	if (root == nullptr) {
+		auto tetris = root_tetris;
+		expand(nullptr, - 1, tetris);
+		return {{tetris, root.get()}};
+	}
+
+	std :: vector<std :: pair<TetrisEnv, Node *>> res;
+
+	std :: function<void(Node *, TetrisEnv)> dfs
+	= [&] (Node * node, TetrisEnv tetris) {
+		for (int u = 0; u < node -> n; u ++) {
+			if (node -> children[u] != nullptr) {
+				auto t = tetris;
+				t.step(node -> actions[u]);
+				dfs(node -> children[u].get(), t);
+				continue;
+			}
+
+			auto t = tetris;
+			expand(node, u, t);
+			res.emplace_back(t, node -> children[u].get());
+		}
+	};
+
+	dfs(root.get(), root_tetris);
+
+	return res;
+}
+
+
 void TetrisMCTS :: back(Node * pos, float V) {
 	while (pos -> parent != nullptr) {
 		int u = pos -> from_action;
@@ -220,4 +253,3 @@ void TetrisMCTS :: step(int u) {
 		root -> parent = nullptr;
 	}
 }
-
