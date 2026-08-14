@@ -75,6 +75,7 @@ public:
 	int get_combo();
 	int get_b2b();
 	bool is_can_hold();
+	bool is_game_over();
 
 	void set_attack_calc(std :: shared_ptr<Scoring :: Calculator> calc);
 

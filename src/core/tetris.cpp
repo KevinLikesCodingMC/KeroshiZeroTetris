@@ -115,6 +115,10 @@ bool TetrisEnv :: is_can_hold() {
 	return can_hold;
 }
 
+bool TetrisEnv :: is_game_over() {
+	return game_over;
+}
+
 void TetrisEnv :: set_attack_calc(
 	std :: shared_ptr<Scoring :: Calculator> calc
 ) {

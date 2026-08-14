@@ -57,3 +57,13 @@ target_link_libraries(
 		PRIVATE
 		tetris_ai
 )
+
+add_executable(
+		test_rollout
+		mcts/rollout.cpp
+)
+target_link_libraries(
+		test_rollout
+		PRIVATE
+		tetris_ai
+)
