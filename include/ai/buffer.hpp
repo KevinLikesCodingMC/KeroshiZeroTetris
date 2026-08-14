@@ -13,7 +13,7 @@ class Buffer {
 public:
 	explicit Buffer(const std :: string & path_str, uint32_t data_size);
 
-	uint32_t get_size();
+	int get_size();
 
 	void import();
 	void add(const void * data, uint32_t count = 1);

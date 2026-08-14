@@ -108,7 +108,7 @@ std :: vector<std :: byte> Buffer :: get(uint32_t u) {
 	return res;
 }
 
-uint32_t Buffer :: get_size() {
+int Buffer :: get_size() {
 	return siz;
 }
 

@@ -55,5 +55,25 @@ target_link_libraries(
 		"${TORCH_LIBRARIES}"
 )
 
+add_library(tetris_train STATIC
+		src/train/selfplay.cpp
+)
+target_link_libraries(
+		tetris_train PRIVATE
+		tetris_ai
+		"${TORCH_LIBRARIES}"
+)
+
 add_subdirectory(tests)
 add_subdirectory(benchmark)
+
+
+add_executable(
+		value_train
+		src/train/value_train.cpp
+)
+target_link_libraries(
+		value_train
+		PRIVATE
+		tetris_train
+)
