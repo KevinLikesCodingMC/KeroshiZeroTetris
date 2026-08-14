@@ -16,6 +16,10 @@ void TetrisMCTS :: set_root(const TetrisEnv & tetris) {
 	root_tetris = tetris;
 }
 
+void TetrisMCTS :: set_V_base(float V) {
+	V_base = V;
+}
+
 std :: vector<int> TetrisMCTS :: get_root_N() {
 	if (root == nullptr) {
 		return {};
@@ -33,9 +37,10 @@ int TetrisMCTS :: node_select(const Node * node) {
 	float o = node -> player ? 1.f : - 1.f;
 
 	for (int i = 0; i < node -> n; i ++) {
-		float score = node -> Q[i] * o
-			+ val * node -> P[i] / (node -> N[i] + 1.f);
+		float Exploration = val * node -> P[i] / (node -> N[i] + 1.f);
+		float Exploitation = (node -> N[i] == 0 ? V_base : node -> Q[i]) * o;
 
+		float score = Exploitation + Exploration;
 		if (score > res) {
 			res = score;
 			id = i;
@@ -45,50 +50,77 @@ int TetrisMCTS :: node_select(const Node * node) {
 	return id;
 }
 
-TetrisEnv TetrisMCTS :: select() {
-	path.clear();
-	leaf_tetris = root_tetris;
-	Node * cur = root.get();
+void TetrisMCTS :: expand(Node * parent, int u, TetrisEnv & tetris) {
 
-	while (! leaf_tetris.is_over() && cur != nullptr) {
-		int u = node_select(cur);
-		path.emplace_back(cur, u);
-		leaf_tetris.step(cur -> actions[u]);
-		cur = cur -> children[u].get();
+	Node * child;
+	if (parent == nullptr) {
+		root = std :: make_unique<Node>();
+		child = root.get();
+		child -> from_action = - 1;
+		child -> parent = nullptr;
+	}
+	else {
+		parent -> children[u] = std :: make_unique<Node>();
+		child = parent -> children[u].get();
+		child -> from_action = u;
+		child -> parent = parent;
+		tetris.step(parent -> actions[u]);
 	}
 
-	return leaf_tetris;
+	if (tetris.is_over()) {
+		child -> n = 0;
+	}
+	else {
+		child -> player = tetris.is_player();
+		auto actions = tetris.get_actions();
+		child -> n = actions.size();
+		child -> actions = actions;
+		child -> children = std :: vector<std :: unique_ptr<Node>>(child -> n);
+		child -> sum_N = 0;
+		child -> P = std :: vector(child -> n, 1.f / child -> n);
+		child -> Q = std :: vector(child -> n, 0.f);
+		child -> N = std :: vector(child -> n, 0);
+	}
 }
 
-void TetrisMCTS :: back(float V) {
-	if (! leaf_tetris.is_over()) {
-		Node * node;
-		if (path.empty()) {
-			root = std :: make_unique<Node>();
-			node = root.get();
-		}
-		else {
-			auto [pos, a] = path.back();
-			pos -> children[a] = std :: make_unique<Node>();
-			node = pos -> children[a].get();
-		}
+std :: pair<TetrisEnv, TetrisMCTS :: Node *> TetrisMCTS :: select() {
 
-		node -> actions = leaf_tetris.get_actions();
-		node -> n = node -> actions.size();
-		node -> sum_N = 0;
-		node -> children = std :: vector<std :: unique_ptr<Node>>(node -> n);
-		node -> P = std :: vector(node -> n, 1.f / node -> n);
-		node -> Q = std :: vector(node -> n, 0.f);
-		node -> N = std :: vector(node -> n, 0);
+	Node * pos;
+	auto tetris = root_tetris;
+
+	if (root == nullptr) {
+		expand(nullptr, - 1, tetris);
+		pos = root.get();
+	}
+	else {
+		pos = root.get();
+
+		while (! tetris.is_over()) {
+			int u = node_select(pos);
+
+			if (pos -> children[u] != nullptr) {
+				tetris.step(pos -> actions[u]);
+				pos = pos -> children[u].get();
+				continue;
+			}
+
+			expand(pos, u, tetris);
+			pos = pos -> children[u].get();
+
+			break;
+		}
 	}
 
-	for (int i = int(path.size()) - 1; i >= 0; i --) {
-		auto [pos, a] = path[i];
-		pos -> N[a] ++;
-		pos -> sum_N ++;
+	return {tetris, pos};
+}
 
-		// Q -> (Q * N + V) / (N + 1) = Q + (V - Q) / (N + 1)
-		pos -> Q[a] += (V - pos -> Q[a]) / pos -> N[a];
+void TetrisMCTS :: back(Node * pos, float V) {
+	while (pos -> parent != nullptr) {
+		int u = pos -> from_action;
+		pos = pos -> parent;
+		pos -> N[u] ++;
+		pos -> sum_N ++;
+		pos -> Q[u] += (V - pos -> Q[u]) / pos -> N[u];
 	}
 }
 
@@ -171,3 +203,21 @@ std :: pair<int, int> TetrisMCTS :: temp_action(float temp) {
 	int id = dist(rnd);
 	return {id, root -> actions[id]};
 }
+
+void TetrisMCTS :: step(int u) {
+	if (root == nullptr) {
+		auto actions = root_tetris.get_actions();
+		root_tetris.step(actions[u]);
+		return;
+	}
+
+	root_tetris.step(root -> actions[u]);
+	auto new_root = std :: move(root -> children[u]);
+	root = std :: move(new_root);
+
+	if (root != nullptr) {
+		root -> from_action = - 1;
+		root -> parent = nullptr;
+	}
+}
+
