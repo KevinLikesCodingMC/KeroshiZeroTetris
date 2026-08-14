@@ -7,7 +7,7 @@
 #include <cmath>
 
 namespace Converter {
-	Dataset :: player_value to_dataset_player_value(TetrisEnv & tetris) {
+	Dataset :: player_value to_dataset_value(TetrisEnv & tetris) {
 		Dataset :: player_value data {};
 
 		for (int row = 0; row < Board :: HEIGHT; row ++) {

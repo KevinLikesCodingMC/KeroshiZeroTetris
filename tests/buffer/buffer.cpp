@@ -14,7 +14,7 @@ int main() {
 
 	TetrisEnv tetris;
 	for (int i = 0; i < 5; i ++) {
-		auto data = Converter :: to_dataset_player_value(tetris);
+		auto data = Converter :: to_dataset_value(tetris);
 		data.V = i;
 		dataset.push_back(data);
 	}

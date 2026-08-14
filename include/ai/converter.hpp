@@ -13,7 +13,7 @@
 namespace Converter {
 
 	// TetrisEnv to Dataset
-	Dataset :: player_value to_dataset_player_value(TetrisEnv & tetris);
+	Dataset :: player_value to_dataset_value(TetrisEnv & tetris);
 
 	// TetrisEnv to Tensor
 	at :: Tensor to_tensor_board(TetrisEnv & tetris);
