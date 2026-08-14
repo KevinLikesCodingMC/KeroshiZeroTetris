@@ -27,7 +27,7 @@ namespace Training :: Value {
 
 		while (! tetris.is_over()) {
 
-			{
+			if (mcts.get_root() == nullptr) {
 				auto [t, node] = mcts.select();
 				float V = tetris.get_attack() + net.predict(t);
 				mcts.back(node, V);

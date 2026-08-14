@@ -31,6 +31,7 @@ public:
 
 	void set_C(float c);
 	void set_root(const TetrisEnv & tetris);
+	Node * get_root();
 	std :: vector<int> get_root_N();
 	void set_V_base(float V);
 

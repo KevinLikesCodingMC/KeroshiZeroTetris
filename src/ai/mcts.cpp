@@ -16,6 +16,9 @@ void TetrisMCTS :: set_C(float c) {
 void TetrisMCTS :: set_root(const TetrisEnv & tetris) {
 	root_tetris = tetris;
 }
+TetrisMCTS :: Node * TetrisMCTS :: get_root() {
+	return root.get();
+}
 
 void TetrisMCTS :: set_V_base(float V) {
 	V_base = V;
@@ -126,7 +129,7 @@ TetrisMCTS :: select_layer() {
 	std :: vector<std :: pair<TetrisEnv, Node *>> res;
 
 	std :: function<void(Node *, TetrisEnv)> dfs
-	= [&] (Node * node, TetrisEnv tetris) {
+	= [&] (Node * node, const TetrisEnv & tetris) {
 		for (int u = 0; u < node -> n; u ++) {
 			if (node -> children[u] != nullptr) {
 				auto t = tetris;
