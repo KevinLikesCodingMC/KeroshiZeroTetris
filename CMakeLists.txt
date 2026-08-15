@@ -58,6 +58,7 @@ target_link_libraries(
 
 add_library(tetris_train STATIC
 		src/train/selfplay.cpp
+		src/train/config.cpp
 )
 target_link_libraries(
 		tetris_train PRIVATE

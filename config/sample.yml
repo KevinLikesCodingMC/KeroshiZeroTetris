@@ -1,0 +1,17 @@
+model:
+  path: "value_1.pt"
+  optimizer: "empty"
+  cuda: false
+
+mcts:
+  C: 5.0
+  simu: 200
+
+buffer:
+  path: "buffer/1"
+  sample: 64
+  window: 100000
+
+train:
+  game: 1000
+  output: "output"

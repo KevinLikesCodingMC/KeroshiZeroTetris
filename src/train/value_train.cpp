@@ -4,69 +4,99 @@
 
 #include "include/ai/buffer.hpp"
 #include "include/train/selfplay.hpp"
+#include "include/train/config.hpp"
 #include "include/utils/logger.hpp"
-
-#include <random>
+#include "include/utils/timer.hpp"
 
 void usage(const char * prg) {
 	std :: cout << "Usage:" << std :: endl;
 	std :: cout << prg << " ";
-	std :: cout << "<model_path> ";
-	std :: cout << "<cuda> ";
-	std :: cout << "<optimizer_path> ";
-	std :: cout << "<buffer_path> ";
-	std :: cout << "<output_path> ";
-	std :: cout << "<game> ";
-	std :: cout << "<sample> ";
+	std :: cout << "<config_path> ";
 	std :: cout << std :: endl;
 }
 
 int main(int argc, char * argv []) {
-	if (argc < 8) {
+	if (argc < 2) {
 		usage(argv[0]);
 		return 1;
 	}
 
-	std :: string model_path = argv[1];
-	bool cuda = std :: stoi(argv[2]) != 0;
-	std :: string optimizer_path = argv[3];
-	std :: string buffer_path = argv[4];
-	std :: string output_path = argv[5];
-	int game_num = std :: stoi(argv[6]);
-	int sample_num = std :: stoi(argv[7]);
+	Timer total_timer;
 
-	if (optimizer_path == "empty") optimizer_path = "";
+	std :: string config_path = argv[1];
+	auto config = Training :: load_config(config_path);
 
-	TetrisValueTrainNet net(model_path, optimizer_path, cuda);
-	ValueBuffer buffer(buffer_path);
-
-	auto get_samples = [&] () {
-		std :: vector<Dataset :: player_value> samples;
-		if (buffer.get_size() == 0) {
-			return samples;
-		}
-
-		static std :: mt19937 rnd(std :: random_device{} ());
-
-		int siz = 100000;
-		int l = std :: max(0, buffer.get_size() - siz);
-		std :: uniform_int_distribution dist(l, buffer.get_size() - 1);
-
-		for (int i = 0; i < sample_num; i ++) {
-			int u = dist(rnd);
-			samples.push_back(buffer.get(u));
-		}
-		return samples;
-	};
-
-	for (int game = 0; game < game_num; game ++) {
-		auto data = Training :: Value :: selfplay(net);
-		buffer.add(data);
-		auto loss = net.train(get_samples());
-		Logger :: info("Loss: ", loss);
+	if (config.optimizer_path == "empty") {
+		config.optimizer_path = "";
 	}
 
-	net.save(output_path);
+	TetrisValueTrainNet net(
+		config.model_path,
+		config.optimizer_path,
+		config.cuda
+	);
+	ValueBuffer buffer(config.buffer_path);
+
+	std :: filesystem :: path output_path = config.output_path;
+
+	std :: vector<float> losses;
+	std :: vector<float> V_list;
+
+	double selfplay_elapse_s = 0;
+	double train_elapse_s = 0;
+	double buffer_elapse_s = 0;
+	double net_elapse_s = 0;
+	double mcts_elapse_s = 0;
+	Timer timer;
+
+	for (int game = 0; game < config.total_games; game ++) {
+		auto res = Training :: Value :: selfplay_single(net);
+
+		timer.reset();
+		buffer.add(res.dataset);
+		auto samples
+			= buffer.sample_random(
+			config.window_size,
+			config.sample_per_game
+			);
+		buffer_elapse_s += timer.elapsed_s();
+
+		timer.reset();
+		float loss = net.train(samples);
+		train_elapse_s += timer.elapsed_s();
+
+		net_elapse_s += res.net_elapse_ms / 1000;
+		mcts_elapse_s += res.mcts_elapse_ms / 1000;
+		selfplay_elapse_s += res.total_elapse_ms / 1000;
+
+		losses.push_back(loss);
+		V_list.push_back(res.V[0]);
+	}
+
+	std :: filesystem :: create_directories(output_path);
+
+	net.save(output_path / "model");
+
+	double total_elapse_s = total_timer.elapsed_s();
+
+	std :: ofstream report_ofs(output_path / "results.txt");
+	report_ofs << "total: " << total_elapse_s << " s" << std :: endl;
+	report_ofs << "selfplay: " << selfplay_elapse_s << " s" << std :: endl;
+	report_ofs << "mcts: " << mcts_elapse_s << " s" << std :: endl;
+	report_ofs << "net: " << net_elapse_s << " s" << std :: endl;
+	report_ofs << "train: " << train_elapse_s << " s" << std :: endl;
+	report_ofs << "buffer: " << buffer_elapse_s << " s" << std :: endl;
+	report_ofs.close();
+
+	std :: ofstream loss_ofs(output_path / "loss.txt");
+	for (auto x : losses) loss_ofs << x << '\n';
+	loss_ofs.close();
+
+	std :: ofstream V_ofs(output_path / "V.txt");
+	for (auto x : V_list) V_ofs << x << '\n';
+	V_ofs.close();
+
+	Logger :: info("Saved.");
 
 	return 0;
 }
