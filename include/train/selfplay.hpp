@@ -11,7 +11,17 @@
 namespace Training {
 	namespace Value {
 		using Data = Dataset :: player_value;
-		std :: vector<Data> selfplay(TetrisValueTrainNet & net);
+
+		struct selfplay_result {
+			double total_elapse_ms;
+			double net_elapse_ms;
+			double mcts_elapse_ms;
+
+			std :: vector<float> V;
+			std :: vector<Dataset :: player_value> dataset;
+		};
+
+		selfplay_result selfplay_single(TetrisValueTrainNet & net);
 	}
 }
 
