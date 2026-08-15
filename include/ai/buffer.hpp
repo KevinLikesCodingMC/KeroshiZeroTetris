@@ -39,6 +39,9 @@ public:
 	void add(const std :: vector<Data> & data);
 
 	Data get(uint32_t u);
+
+	std :: vector<Data> sample_random(int sz, int n);
+
 };
 
 #endif //KEROSHIZEROTETRIS_BUFFER_HPP

@@ -6,6 +6,7 @@
 #include "include/utils/logger.hpp"
 
 #include <fstream>
+#include <random>
 
 Buffer :: Buffer(const std :: string & path_str, uint32_t data_size)
 	: path(path_str)
@@ -129,4 +130,27 @@ Dataset :: player_value ValueBuffer :: get(uint32_t u) {
 
 	auto bytes = Buffer :: get(u);
 	return * reinterpret_cast<const Data *>(bytes.data());
+}
+
+std :: vector<Dataset :: player_value>
+ValueBuffer :: sample_random(int sz, int n) {
+	std :: vector<Data> samples;
+	if (get_size() == 0) {
+		return samples;
+	}
+
+	static std :: mt19937 rnd(std :: random_device{} ());
+
+	int l = std :: max(0, get_size() - sz);
+	std :: uniform_int_distribution dist(l, get_size() - 1);
+
+	samples.reserve(n);
+	for (int i = 0; i < n; i ++) {
+		int u1 = dist(rnd);
+		int u2 = dist(rnd);
+		int u = std :: max(u1, u2);
+		samples.push_back(get(u));
+	}
+
+	return samples;
 }
