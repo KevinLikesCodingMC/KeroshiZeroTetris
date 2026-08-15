@@ -22,6 +22,7 @@ target_link_libraries(
 )
 
 find_package(OpenMP REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 if(MSVC)
 	set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -allow-unsupported-compiler")
