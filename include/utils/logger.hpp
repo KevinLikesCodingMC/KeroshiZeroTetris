@@ -16,11 +16,16 @@ namespace Logger {
 		WARNING,
 		ERROR,
 		DEBUG,
+		PROGRESS,
 	};
 
 	template < typename ... Args>
 	void log(Level level, Args && ... args) {
 		std :: ostream & os = level == Level :: INFO ? std :: cout : std :: cerr;
+
+		if (level == Level :: PROGRESS) {
+			os << "\r\033[K";
+		}
 
 		auto now = std :: chrono :: system_clock :: now();
 		auto time_t = std :: chrono :: system_clock :: to_time_t(now);
@@ -31,8 +36,16 @@ namespace Logger {
 		if (level == Level :: WARNING) os << "[WARN] ";
 		if (level == Level :: ERROR) os << "[ERROR] ";
 		if (level == Level :: DEBUG) os << "[DEBUG] ";
+		if (level == Level :: PROGRESS) os << "[PROGRESS] ";
 
-		(os << ... << args) << std :: endl;
+		(os << ... << args);
+
+		if (level == Level :: PROGRESS) {
+			os << std :: flush;
+		}
+		else {
+			os << std :: endl;
+		}
 	}
 
 	template < typename ... Args>
@@ -53,6 +66,11 @@ namespace Logger {
 	template < typename ... Args>
 	void debug(Args && ... args) {
 		log(Level :: DEBUG, args ...);
+	}
+
+	template < typename ... Args>
+	void progress(Args && ... args) {
+		log(Level :: PROGRESS, args ...);
 	}
 
 }

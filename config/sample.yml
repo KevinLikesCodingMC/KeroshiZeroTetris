@@ -14,5 +14,5 @@ buffer:
   window: 100000
 
 train:
-  game: 100
+  game: 300
   output: "output"

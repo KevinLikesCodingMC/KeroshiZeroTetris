@@ -73,7 +73,14 @@ int main(int argc, char * argv []) {
 		for (auto V : res.V) {
 			V_list.push_back(V);
 		}
+
+		Logger :: progress(
+			"game: ", game + config.mcts_batch, " | "
+			"Loss: ", loss
+		);
 	}
+
+	std :: cout << std :: endl;
 
 	std :: filesystem :: create_directories(output_path);
 
