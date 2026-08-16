@@ -218,7 +218,7 @@ std :: pair<int, int> TetrisMCTS :: temp_action(float temp) {
 	std :: vector<float> x(n);
 	float x_max = 1e-9;
 	for (int i = 0; i < n; i ++) {
-		x[i] = std :: logf(root -> N[i] + 1) / temp;
+		x[i] = std :: log(root -> N[i] + 1) / temp;
 		x_max = std :: max(x_max, x[i]);
 	}
 
@@ -226,7 +226,7 @@ std :: pair<int, int> TetrisMCTS :: temp_action(float temp) {
 	std :: vector<float> p(n);
 	for (int i = 0; i < n; i ++) {
 		x[i] -= x_max;
-		p[i] = std :: expf(x[i]);
+		p[i] = std :: exp(x[i]);
 		sum += p[i];
 	}
 	for (int i = 0; i < n; i ++) {

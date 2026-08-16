@@ -23,7 +23,7 @@ namespace Converter {
 		data.info[0] = tetris.get_rest_pieces();
 		data.info[1] = tetris.is_can_hold() ? 1.f : 0.f;
 		data.info[2] = tetris.get_combo();
-		data.info[3] = std :: logf(tetris.get_b2b() + 1);
+		data.info[3] = std :: log(tetris.get_b2b() + 1);
 
 		return data;
 	}
@@ -63,7 +63,7 @@ namespace Converter {
 		acc[0][0] = tetris.get_rest_pieces();
 		acc[0][1] = tetris.is_can_hold() ? 1.f : 0.f;
 		acc[0][2] = tetris.get_combo();
-		acc[0][3] = std :: logf(tetris.get_b2b() + 1);
+		acc[0][3] = std :: log(tetris.get_b2b() + 1);
 
 		return tensor;
 	}
@@ -109,7 +109,7 @@ namespace Converter {
 			acc[0][0] = tetris[I].get_rest_pieces();
 			acc[0][1] = tetris[I].is_can_hold() ? 1.f : 0.f;
 			acc[0][2] = tetris[I].get_combo();
-			acc[0][3] = std :: logf(tetris[I].get_b2b() + 1);
+			acc[0][3] = std :: log(tetris[I].get_b2b() + 1);
 		}
 
 		return tensor;
