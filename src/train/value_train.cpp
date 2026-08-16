@@ -50,7 +50,7 @@ int main(int argc, char * argv []) {
 	Timer timer;
 
 	for (int game = 0; game < config.total_games; game ++) {
-		auto res = Training :: Value :: selfplay_single(net);
+		auto res = Training :: Value :: selfplay_single(net, config);
 
 		timer.reset();
 		buffer.add(res.dataset);

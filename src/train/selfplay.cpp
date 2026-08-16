@@ -8,7 +8,10 @@
 #include "include/utils/timer.hpp"
 
 namespace Training :: Value {
-	selfplay_result selfplay(TetrisValueTrainNet & net) {
+	selfplay_result selfplay_single(
+		TetrisValueTrainNet & net,
+		const training_config & config
+	) {
 
 		Timer total_timer;
 		Timer timer;
@@ -37,10 +40,10 @@ namespace Training :: Value {
 
 		std :: vector<Data> tetris_data;
 		TetrisMCTS mcts;
-		mcts.set_C(5);
+		mcts.set_C(config.mcts_C);
 		mcts.set_root(tetris);
 
-		int simu = 200;
+		int simu = config.mcts_simu;
 
 		while (! tetris.is_over()) {
 

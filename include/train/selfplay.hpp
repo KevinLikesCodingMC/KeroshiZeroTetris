@@ -7,6 +7,7 @@
 
 #include "include/ai/dataset.hpp"
 #include "include/ai/net.hpp"
+#include "config.hpp"
 
 namespace Training {
 	namespace Value {
@@ -21,7 +22,10 @@ namespace Training {
 			std :: vector<Dataset :: player_value> dataset;
 		};
 
-		selfplay_result selfplay_single(TetrisValueTrainNet & net);
+		selfplay_result selfplay_single(
+			TetrisValueTrainNet & net,
+			const training_config & config
+		);
 	}
 }
 

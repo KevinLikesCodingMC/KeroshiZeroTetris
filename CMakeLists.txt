@@ -63,6 +63,7 @@ add_library(tetris_train STATIC
 target_link_libraries(
 		tetris_train PRIVATE
 		tetris_ai
+		yaml-cpp
 		"${TORCH_LIBRARIES}"
 )
 
