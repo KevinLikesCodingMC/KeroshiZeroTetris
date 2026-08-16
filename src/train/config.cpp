@@ -31,12 +31,13 @@ namespace Training {
 
 		if (root["buffer"]) {
 			yaml :: get_val(root["buffer"]["path"], config.buffer_path);
-			yaml :: get_val(root["buffer"]["sample"], config.sample_per_game);
 			yaml :: get_val(root["buffer"]["window"], config.window_size);
 		}
 
 		if (root["train"]) {
 			yaml :: get_val(root["train"]["game"], config.total_games);
+			yaml :: get_val(root["train"]["batch"], config.train_batch);
+			yaml :: get_val(root["train"]["num"], config.train_num);
 			yaml :: get_val(root["train"]["output"], config.output_path);
 		}
 

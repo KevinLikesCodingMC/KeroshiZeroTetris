@@ -54,30 +54,34 @@ int main(int argc, char * argv []) {
 
 		timer.reset();
 		buffer.add(res.dataset);
-		auto samples
-			= buffer.sample_random(
-			config.window_size,
-			config.sample_per_game
-			);
 		buffer_elapse_s += timer.elapsed_s();
 
-		timer.reset();
-		float loss = net.train(samples);
-		train_elapse_s += timer.elapsed_s();
+		for (int k = 0; k < config.train_num; k ++) {
+			timer.reset();
+			auto samples
+				= buffer.sample_random(
+				config.window_size,
+				config.train_batch
+				);
+			buffer_elapse_s += timer.elapsed_s();
+			timer.reset();
+			float loss = net.train(samples);
+			losses.push_back(loss);
+			train_elapse_s += timer.elapsed_s();
+
+			Logger :: progress(
+				"game: ", game + config.mcts_batch, " | "
+				"Loss: ", loss
+			);
+		}
 
 		net_elapse_s += res.net_elapse_ms / 1000;
 		mcts_elapse_s += res.mcts_elapse_ms / 1000;
 		selfplay_elapse_s += res.total_elapse_ms / 1000;
 
-		losses.push_back(loss);
 		for (auto V : res.V) {
 			V_list.push_back(V);
 		}
-
-		Logger :: progress(
-			"game: ", game + config.mcts_batch, " | "
-			"Loss: ", loss
-		);
 	}
 
 	std :: cout << std :: endl;

@@ -22,9 +22,10 @@ namespace Training {
 
 		std :: string buffer_path;
 		int window_size = 100000;
-		int sample_per_game = 64;
 
 		int total_games = 1;
+		int train_batch = 512;
+		int train_num = 32;
 
 		std :: string output_path;
 	};

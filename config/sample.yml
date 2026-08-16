@@ -10,9 +10,10 @@ mcts:
 
 buffer:
   path: "buffer/1"
-  sample: 10000
-  window: 100000
+  window: 200000
 
 train:
   game: 300
+  num: 32
+  batch: 512
   output: "output"
