@@ -26,6 +26,7 @@ namespace Training {
 		if (root["mcts"]) {
 			yaml :: get_val(root["mcts"]["C"], config.mcts_C);
 			yaml :: get_val(root["mcts"]["simu"], config.mcts_simu);
+			yaml :: get_val(root["mcts"]["batch"], config.mcts_batch);
 		}
 
 		if (root["buffer"]) {

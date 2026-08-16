@@ -12,20 +12,21 @@
 namespace Training {
 
 	struct training_config {
-		std :: string model_path = "";
-		std :: string optimizer_path = "";
+		std :: string model_path;
+		std :: string optimizer_path;
 		bool cuda = false;
 
 		float mcts_C = 5;
 		int mcts_simu = 100;
+		int mcts_batch = 1;
 
-		std :: string buffer_path = "";
+		std :: string buffer_path;
 		int window_size = 100000;
 		int sample_per_game = 64;
 
 		int total_games = 1;
 
-		std :: string output_path = "";
+		std :: string output_path;
 	};
 
 	training_config load_config(std :: string config_path);

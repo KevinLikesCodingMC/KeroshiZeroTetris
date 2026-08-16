@@ -49,8 +49,8 @@ int main(int argc, char * argv []) {
 	double mcts_elapse_s = 0;
 	Timer timer;
 
-	for (int game = 0; game < config.total_games; game ++) {
-		auto res = Training :: Value :: selfplay_single(net, config);
+	for (int game = 0; game < config.total_games; game += config.mcts_batch) {
+		auto res = Training :: Value :: selfplay_batch(net, config);
 
 		timer.reset();
 		buffer.add(res.dataset);
@@ -70,7 +70,9 @@ int main(int argc, char * argv []) {
 		selfplay_elapse_s += res.total_elapse_ms / 1000;
 
 		losses.push_back(loss);
-		V_list.push_back(res.V[0]);
+		for (auto V : res.V) {
+			V_list.push_back(V);
+		}
 	}
 
 	std :: filesystem :: create_directories(output_path);

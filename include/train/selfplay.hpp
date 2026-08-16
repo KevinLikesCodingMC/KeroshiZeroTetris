@@ -26,6 +26,11 @@ namespace Training {
 			TetrisValueTrainNet & net,
 			const training_config & config
 		);
+
+		selfplay_result selfplay_batch(
+			TetrisValueTrainNet & net,
+			const training_config & config
+		);
 	}
 }
 

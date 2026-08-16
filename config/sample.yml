@@ -6,12 +6,13 @@ model:
 mcts:
   C: 5.0
   simu: 200
+  batch: 128
 
 buffer:
   path: "buffer/1"
-  sample: 64
+  sample: 10000
   window: 100000
 
 train:
-  game: 1000
+  game: 100
   output: "output"
