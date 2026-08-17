@@ -76,7 +76,7 @@ namespace Converter {
 		for (int I = 0; I < batch; I ++) {
 			for (int y = 0; y < Board :: HEIGHT; y ++) {
 				for (int x = 0; x < Board :: WIDTH; x ++) {
-					acc[0][0][y][x] = tetris[I].get_board(x, y) ? 1.f : 0.f;
+					acc[I][0][y][x] = tetris[I].get_board(x, y) ? 1.f : 0.f;
 				}
 			}
 		}
@@ -90,10 +90,10 @@ namespace Converter {
 
 		auto acc = tensor.accessor<int64_t, 2>();
 		for (int I = 0; I < batch; I ++) {
-			acc[0][0] = static_cast<int64_t>(tetris[I].get_cur());
-			acc[0][1] = static_cast<int64_t>(tetris[I].get_hold());
+			acc[I][0] = static_cast<int64_t>(tetris[I].get_cur());
+			acc[I][1] = static_cast<int64_t>(tetris[I].get_hold());
 			for (int i = 0; i < Board :: NEXT; i ++) {
-				acc[0][i + 2] = static_cast<int64_t>(tetris[I].get_next(i));
+				acc[I][i + 2] = static_cast<int64_t>(tetris[I].get_next(i));
 			}
 		}
 
@@ -106,10 +106,10 @@ namespace Converter {
 
 		auto acc = tensor.accessor<float, 2>();
 		for (int I = 0; I < batch; I ++) {
-			acc[0][0] = tetris[I].get_rest_pieces();
-			acc[0][1] = tetris[I].is_can_hold() ? 1.f : 0.f;
-			acc[0][2] = tetris[I].get_combo();
-			acc[0][3] = std :: log(tetris[I].get_b2b() + 1);
+			acc[I][0] = tetris[I].get_rest_pieces();
+			acc[I][1] = tetris[I].is_can_hold() ? 1.f : 0.f;
+			acc[I][2] = tetris[I].get_combo();
+			acc[I][3] = std :: log(tetris[I].get_b2b() + 1);
 		}
 
 		return tensor;
