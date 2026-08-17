@@ -122,7 +122,7 @@ namespace Training :: Value {
 			std :: vector<float> V = net.predict(t);
 			net_elapse_ms += timer.elapsed_ms();
 
-			for (int I = 0; I < batch; I ++) {
+			for (int I = 0; I < t.size(); I ++) {
 				if (t[I].is_over()) {
 					V[I] = get_V(t[I]);
 				}
@@ -153,57 +153,60 @@ namespace Training :: Value {
 			}
 		};
 
-		std :: vector<TetrisEnv> t_batch(batch);
-
 		bool finished = false;
 		while (! finished) {
+			std :: vector<int> id;
+			for (int I = 0; I < batch; I ++) {
+				if (tetris[I].is_over()) continue;
+				id.push_back(I);
+			}
+
 			{
 				auto V = predict_batch_V(tetris);
-				for (int I = 0; I < batch; I ++) {
+				for (int I : id) {
 					mcts[I].set_V_base(V[I]);
 				}
 			}
 
+			std :: vector<TetrisEnv> t_batch(id.size());
+
 			for (int k = 0; k < simu; k ++) {
 				if (k == 1) {
-					for (int I = 0; I < batch; I ++) {
-						if (tetris[I].is_over()) continue;
+					for (int I : id) {
 						mcts[I].noise();
 					}
 				}
 
 				timer.reset();
 				std :: vector<TetrisMCTS :: Node *> nodes (batch, nullptr);
-				for (int I = 0; I < batch; I ++) {
-					if (tetris[I].is_over()) continue;
+				for (int i = 0; i < id.size(); i ++) {
+					int I = id[i];
 					auto [t, node] = mcts[I].select();
-					t_batch[I] = t;
+					t_batch[i] = t;
 					nodes[I] = node;
 				}
 				mcts_elapse_ms += timer.elapsed_ms();
 
 				auto V = predict_batch_V(t_batch);
 				timer.reset();
-				for (int I = 0; I < batch; I ++) {
-					if (tetris[I].is_over()) continue;
-					mcts[I].back(nodes[I], V[I]);
+				for (int i = 0; i < id.size(); i ++) {
+					int I = id[i];
+					mcts[I].back(nodes[I], V[i]);
 				}
 				mcts_elapse_ms += timer.elapsed_ms();
 			}
 
-			for (int I = 0; I < batch; I ++) {
-				if (tetris[I].is_over()) continue;
-
+			for (int I : id) {
 				auto data = Converter :: to_dataset_value(tetris[I]);
 				data.V = tetris[I].get_attack();
 				tetris_data[I].push_back(data);
 
 				timer.reset();
-				auto [id, action] = mcts[I].temp_action(0.2);
+				auto [aid, action] = mcts[I].temp_action(0.2);
 				mcts_elapse_ms += timer.elapsed_ms();
 
 				tetris[I].step(action);
-				mcts[I].step(id);
+				mcts[I].step(aid);
 
 				if (tetris[I].is_over()) {
 					add_dataset(I);
@@ -211,7 +214,7 @@ namespace Training :: Value {
 			}
 
 			finished = true;
-			for (int I = 0; I < batch; I ++) {
+			for (int I : id) {
 				if (! tetris[I].is_over()) {
 					finished = false;
 					break;
